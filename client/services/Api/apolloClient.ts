@@ -2,19 +2,26 @@ import {useMemo} from 'react'
 
 // from https://github.com/vercel/next.js/blob/master/examples/with-apollo/lib/apolloClient.js
 import {ApolloClient, HttpLink, InMemoryCache} from '@apollo/client'
+import {setContext} from '@apollo/client/link/context'
 import {concatPagination} from '@apollo/client/utilities'
 
 let apolloClient
 
 function createApolloClient() {
+  const link = new HttpLink({
+    uri: `https://kehilla.h4x.sh/v1/graphql`,
+  })
+
+  const setAuthorizationLink = setContext((request, previousContext) => ({
+    headers: {
+      ...previousContext.headers,
+      authorization: `Bearer ${localStorage.getItem('auth_token')}`,
+    },
+  }))
+
   return new ApolloClient({
     ssrMode: typeof window === 'undefined',
-    link: new HttpLink({
-      uri: `http${process.env.SSL === 'true' ? 's' : ''}://${process.env.HOSTNAME}${
-        process.env.PORT !== '80' ? `:${process.env.PORT}` : ''
-      }/api/graphql`, // Server URL (must be absolute)
-      credentials: 'same-origin', // Additional fetch() options like `credentials` or `headers`
-    }),
+    link: setAuthorizationLink.concat(link),
     cache: new InMemoryCache({
       typePolicies: {
         Query: {

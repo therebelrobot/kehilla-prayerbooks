@@ -5,18 +5,35 @@ import create from 'zustand'
 export interface State {
   friendName: string
   fancyFriendName: string
-  updateFriendName: (name: string) => void
+  updateFriendName: (newName: State['friendName']) => void
+  selectedFont: 'Spectral'
+  updateSelectedFont: (newFont: State['selectedFont']) => void
+  reload: boolean
+  forceReload: () => void
 }
 
 // defaults
 const defaultFriendName = 'world'
 const defaultFancyFriendName = `✨ ${defaultFriendName} ✨`
+const defaultSelectedFont = 'Spectral'
+const defaultForceReload = false
 
 // mutations
 const updateFriendName = (newName: State['friendName'], state: State) => {
   const newState = {...state}
   newState.friendName = newName
   newState.fancyFriendName = `✨ ${newName} ✨`
+  return newState
+}
+
+const updateSelectedFont = (newFont: State['selectedFont'], state: State) => {
+  const newState = {...state}
+  newState.selectedFont = newFont
+  return newState
+}
+const forceReload = (state: State) => {
+  const newState = {...state}
+  newState.reload = !state.reload
   return newState
 }
 
@@ -32,6 +49,11 @@ export const useStore = create(
     friendName: defaultFriendName,
     fancyFriendName: defaultFancyFriendName,
     updateFriendName: (newName: string) => set((state: State) => updateFriendName(newName, state)),
+    selectedFont: defaultSelectedFont,
+    updateSelectedFont: (newFont: State['selectedFont']) =>
+      set((state: State) => updateSelectedFont(newFont, state)),
+    reload: defaultForceReload,
+    forceReload: () => set((state: State) => forceReload(state)),
   })
 )
 
@@ -43,4 +65,16 @@ export const useFriendName = () =>
     updateFriendName: state.updateFriendName,
     getFriendName: () => getFriendName(state),
     getFancyFriendName: () => getFancyFriendName(state),
+  }))
+
+export const useFont = () =>
+  useStore((state: State) => ({
+    selectedFont: state.selectedFont,
+    updateSelectedFont: state.updateSelectedFont,
+  }))
+
+export const useReload = () =>
+  useStore((state: State) => ({
+    reload: state.reload,
+    forceReload: state.forceReload,
   }))

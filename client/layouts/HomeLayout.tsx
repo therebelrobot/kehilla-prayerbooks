@@ -2,7 +2,7 @@ import * as React from 'react'
 
 import {Box} from '@chakra-ui/react'
 
-import {ExampleComponent} from '_/components/ExampleComponent'
+import {ListPrayerbooks} from '_/components/ListPrayerbooks'
 
 export const HomeLayout = () => {
   // Homepage layout is created here.
@@ -16,7 +16,7 @@ export const HomeLayout = () => {
       alignItems="center"
       justifyContent="center"
     >
-      <ExampleComponent greeting="Hello" />
+      <ListPrayerbooks />
     </Box>
   )
 }

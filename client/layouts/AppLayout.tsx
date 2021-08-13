@@ -1,8 +1,12 @@
 import React from 'react'
 
+import NoSSR from 'react-no-ssr'
+
 import {MoonIcon, SunIcon} from '@chakra-ui/icons'
-import {Box, IconButton, useColorMode} from '@chakra-ui/react'
+import {Box, Flex, IconButton, useColorMode} from '@chakra-ui/react'
 import {css, Global} from '@emotion/react'
+
+import {LoginButton} from '_/components/LoginButton'
 
 const bgColor = {light: 'white', dark: 'rgb(26, 32, 44)'}
 
@@ -22,7 +26,7 @@ export const AppLayout = ({children}) => {
         `}
       />
       <Box position="fixed" top={0} left={0} w="100vw" h="100vh" overflow="auto">
-        <Box position="fixed" right={8} top={8}>
+        <Flex position="fixed" right={8} top={8} direction="column">
           <IconButton
             aria-label="Toggle Theme Mode"
             icon={colorMode === 'light' ? <MoonIcon /> : <SunIcon />}
@@ -30,7 +34,11 @@ export const AppLayout = ({children}) => {
           >
             {colorMode}
           </IconButton>
-        </Box>
+          <Box width="8px" height="8px" />
+          <NoSSR>
+            <LoginButton />
+          </NoSSR>
+        </Flex>
         {children}
       </Box>
     </>
