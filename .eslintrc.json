@@ -1,0 +1,49 @@
+{
+  "parser": "@typescript-eslint/parser",
+  "extends": ["react-app", "plugin:@typescript-eslint/recommended", "prettier"],
+  "plugins": ["react-hooks", "prettier"],
+  "rules": {
+    "import/extensions": [
+      "error",
+      "never",
+      {
+        "json": "always",
+        "svg": "always"
+      }
+    ],
+    "prettier/prettier": [
+      "error",
+      {},
+      {
+        "usePrettierrc": true
+      }
+    ],
+    "react-hooks/rules-of-hooks": "error",
+    "no-console": "error",
+    "import/no-anonymous-default-export": "error",
+    "import/no-duplicates": "error",
+    "prefer-const": "off",
+    "@typescript-eslint/ban-ts-ignore": "off",
+    "@typescript-eslint/camelcase": "off",
+    "@typescript-eslint/member-delimiter-style": [
+      "error",
+      {
+        "multiline": {
+          "delimiter": "none"
+        }
+      }
+    ],
+    "@typescript-eslint/no-use-before-define": "off",
+    "@typescript-eslint/no-inferrable-types": "off",
+    "@typescript-eslint/no-empty-function": "off",
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/no-explicit-any": "off",
+    "@typescript-eslint/no-unused-vars": "off",
+    "@typescript-eslint/no-angle-bracket-type-assertion": "off",
+    "@typescript-eslint/no-var-requires": "off",
+    "react-hooks/exhaustive-deps": "off",
+    "no-fallthrough": "error",
+    "no-self-assign": "off",
+    "no-lone-blocks": "off"
+  }
+}

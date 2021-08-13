@@ -1,0 +1,12 @@
+#!/usr/bin/env node
+require('dotenv').config()
+const startCli = require('next/dist/cli/next-start')
+const buildCli = require('next/dist/cli/next-build')
+const devCli = require('next/dist/cli/next-dev')
+
+if (process.env.ENVIRONMENT === 'development') {
+  devCli.nextDev(['-p', process.env.PORT || 3000, '-H', process.env.HOSTNAME || '0.0.0.0'])
+} else {
+  buildCli.nextBuild()
+  startCli.nextStart(['-p', process.env.PORT || 3000, '-H', process.env.HOSTNAME || '0.0.0.0'])
+}

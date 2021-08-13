@@ -1,0 +1,35 @@
+{
+  "typescript.preferences.importModuleSpecifier": "non-relative",
+  "typescript.preferences.importModuleSpecifierEnding": "minimal",
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "editor.formatOnSave": true,
+  "importSorter.generalConfiguration.sortOnBeforeSave": true,
+  "importSorter.importStringConfiguration.hasSemicolon": false,
+  "importSorter.importStringConfiguration.spacingPerImportExpression.afterStartingBracket": 0,
+  "importSorter.importStringConfiguration.spacingPerImportExpression.beforeEndingBracket": 0,
+  "importSorter.importStringConfiguration.maximumNumberOfImportExpressionsPerLine.count": 80,
+  "importSorter.importStringConfiguration.numberOfEmptyLinesAfterAllImports": 1,
+  "importSorter.sortConfiguration.importMembers.direction": "asc",
+  "importSorter.sortConfiguration.joinImportPaths": true,
+  "importSorter.sortConfiguration.customOrderingRules.rules": [{
+      "regex": "^react$",
+      "orderLevel": 10
+    },
+    {
+      "regex": "^[@]",
+      "orderLevel": 30
+    },
+    {
+      "regex": "^_.*\\.mock",
+      "orderLevel": 60
+    },
+    {
+      "regex": "^_",
+      "orderLevel": 40
+    },
+    {
+      "regex": "^mocks",
+      "orderLevel": 50
+    }
+  ]
+}

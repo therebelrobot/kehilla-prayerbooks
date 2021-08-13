@@ -1,0 +1,7 @@
+type Query {
+  greetingLocation: Location!
+}
+type Location {
+  name: String!
+  geolocation: String
+}
