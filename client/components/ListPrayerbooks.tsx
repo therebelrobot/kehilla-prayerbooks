@@ -1,10 +1,11 @@
 import React, {FC} from 'react'
 
+import Link from 'next/link'
 import {
     MdCancel, MdNewReleases, MdPauseCircleFilled, MdSwapVerticalCircle
 } from 'react-icons/md'
 
-import {List, ListIcon, ListItem, Text} from '@chakra-ui/react'
+import {Link as ChLink, List, ListIcon, ListItem} from '@chakra-ui/react'
 
 import {useListPrayerbooks} from '_/services/Api/queries'
 
@@ -27,7 +28,7 @@ export const ListPrayerbooks: FC<ListPrayerbooksProps> = ({}) => {
   const {loading, error, books} = useListPrayerbooks()
 
   if (loading) return <p>Loading...</p>
-  if (error) return <p>Error :(</p>
+  if (error) return <p>Error :( {JSON.stringify(error)}</p>
   return (
     <>
       <List spacing={3}>
@@ -35,7 +36,9 @@ export const ListPrayerbooks: FC<ListPrayerbooksProps> = ({}) => {
           return (
             <ListItem display="flex" flexDirection="row" alignItems="center">
               <ListIcon as={statusIcons[book.status]} color={`${statusColors[book.status]}.500`} />
-              <Text>{book.name}</Text>
+              <Link href={`/reading/${book.slug}`}>
+                <ChLink>{book.name}</ChLink>
+              </Link>
             </ListItem>
           )
         })}

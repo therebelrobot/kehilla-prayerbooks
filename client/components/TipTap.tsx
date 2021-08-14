@@ -6,6 +6,7 @@ import {
     MdRedo, MdStrikethroughS, MdUndo
 } from 'react-icons/md'
 import {VscHorizontalRule} from 'react-icons/vsc'
+import {throttle} from 'throttle-debounce'
 
 import {IconButton} from '@chakra-ui/react'
 import {
@@ -15,7 +16,8 @@ import {
 import {EditorContent, useEditor} from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 
-import {useUpsertProse} from '_/services/Api/queries'
+import {useInsertProse, useUpdateProse} from '_/services/Api/queries'
+import {useEditing, useStore} from '_/services/state'
 
 const MenuBar = ({editor}) => {
   if (!editor) {
@@ -150,36 +152,41 @@ const MenuBar = ({editor}) => {
 }
 
 export const TipTap = ({content, id: inheritedId, prayerId}) => {
-  const [id, setId] = React.useState(inheritedId)
-  const {upsertProse} = useUpsertProse(!!id)
-  const onUpdate = React.useCallback(
-    (json) => {
-      console.log({json}, id)
-      const variables = {tiptap_content: json, prayer_id: prayerId}
-      if (id) {
-        console.log('id present', id)
-        variables.id = id
+  const {activeEditId, setActiveEditId} = useEditing()
+  const {insertProse, loading: insertLoading} = useInsertProse()
+  const {updateProse, loading: updateLoading} = useUpdateProse()
+  console.log(activeEditId)
+  const onUpdate = (json) => {
+    if (insertLoading || updateLoading) return
+    const {activeEditId: directId} = useStore.getState()
+    if (directId) {
+      console.log('updateProse')
+      const variables = {tiptap_content: json, prayer_id: prayerId, id: directId}
+      updateProse({variables})
+      return
+    }
+
+    console.log('insertProse', activeEditId)
+    const variables = {tiptap_content: json, prayer_id: prayerId}
+    insertProse({variables}).then((data) => {
+      console.log({data})
+      if (data.data.insert_prose) {
+        console.log('insert', data.data.insert_prose.returning[0].id)
+        setActiveEditId(data.data.insert_prose.returning[0].id)
+        return
       }
-      upsertProse({variables}).then((data) => {
-        console.log({data})
-        if (data.data.insert_prose) {
-          console.log('insert')
-          setId(data.data.insert_prose.returning[0].id)
-          return
-        }
-        console.log('update')
-      })
-    },
-    [id, upsertProse, setId]
-  )
+      console.log('update')
+    })
+  }
+
   const editor = useEditor({
     extensions: [StarterKit],
     content,
-    onUpdate() {
-      const json = this.getJSON()
+    onUpdate: throttle(2000, ({editor}) => {
+      const json = editor.getJSON()
       onUpdate(json)
       // send the content to an API here
-    },
+    }),
   })
 
   return (

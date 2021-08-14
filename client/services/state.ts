@@ -10,6 +10,8 @@ export interface State {
   updateSelectedFont: (newFont: State['selectedFont']) => void
   reload: boolean
   forceReload: () => void
+  activeEditId: number | null
+  setActiveEditId: (id: State['activeEditId']) => void
 }
 
 // defaults
@@ -37,6 +39,12 @@ const forceReload = (state: State) => {
   return newState
 }
 
+const updateActiveEditId = (id: State['activeEditId'], state: State) => {
+  const newState = {...state}
+  newState.activeEditId = id
+  return newState
+}
+
 // selectors
 const getFriendName = (state: State) => state.friendName
 const getFancyFriendName = (state: State) => state.fancyFriendName
@@ -54,6 +62,9 @@ export const useStore = create(
       set((state: State) => updateSelectedFont(newFont, state)),
     reload: defaultForceReload,
     forceReload: () => set((state: State) => forceReload(state)),
+    activeEditId: null,
+    setActiveEditId: (id: State['activeEditId']) =>
+      set((state: State) => updateActiveEditId(id, state)),
   })
 )
 
@@ -77,4 +88,10 @@ export const useReload = () =>
   useStore((state: State) => ({
     reload: state.reload,
     forceReload: state.forceReload,
+  }))
+
+export const useEditing = () =>
+  useStore((state: State) => ({
+    activeEditId: state.activeEditId,
+    setActiveEditId: state.setActiveEditId,
   }))
