@@ -212,3 +212,44 @@ export const useGetProseAndLines = (bookSlug, sectionSlug, prayerSlug) => {
   })
   return {...rest, data, prose, lines, ordered}
 }
+
+const INSERT_BOOK_MUTATION = gql`
+  mutation InsertBookMutation(
+    $name: String = ""
+    $pdf_link: String = ""
+    $slug: String = ""
+    $status: String = ""
+  ) {
+    insert_prayerbooks(
+      objects: [{name: $name, pdf_link: $pdf_link, slug: $slug, status: $status}]
+    ) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+  }
+`
+const UPDATE_BOOK_MUTATION = gql`
+  mutation MyMutation($_set: prayerbooks_set_input = {}, $bookId: Int = 10) {
+    update_prayerbooks(where: {id: {_eq: $bookId}}, _set: $_set) {
+      affected_rows
+    }
+  }
+`
+export const useUpdateBook = (bookId) => {
+  const [updateBook, {loading, error, data}] = useMutation(UPDATE_BOOK_MUTATION, {
+    context: {headers: {authorization: `Bearer ${localStorage().getItem('auth_token')}`}},
+    variables: {bookId},
+    refetchQueries: [{query: LIST_PRAYERBOOKS_QUERY}],
+  })
+
+  return {updateBook, loading, error, data}
+}
+export const useInsertBook = () => {
+  const [insertBook, {loading, error, data}] = useMutation(INSERT_BOOK_MUTATION, {
+    context: {headers: {authorization: `Bearer ${localStorage().getItem('auth_token')}`}},
+    refetchQueries: [{query: LIST_PRAYERBOOKS_QUERY}],
+  })
+  return {insertBook, loading, error, data}
+}

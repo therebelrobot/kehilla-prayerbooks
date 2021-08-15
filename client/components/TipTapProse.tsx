@@ -151,7 +151,7 @@ const MenuBar = ({editor}) => {
   )
 }
 
-export const TipTap = ({content, id: inheritedId, prayerId}) => {
+export const TipTapProse = ({content, prayerId}) => {
   const {activeEditId, setActiveEditId} = useEditing()
   const {insertProse, loading: insertLoading} = useInsertProse()
   const {updateProse, loading: updateLoading} = useUpdateProse()

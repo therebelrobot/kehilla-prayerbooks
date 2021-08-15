@@ -4,7 +4,7 @@ import NoSSR from 'react-no-ssr'
 
 import {Box} from '@chakra-ui/react'
 
-import {TipTap} from '_/components/TipTap'
+import {EditPrayerbooks} from '_/components/EditPrayerbooks'
 
 const defaultContent = `
 <h2>
@@ -37,7 +37,7 @@ const defaultContent = `
 </blockquote>
 `
 
-export const EditingLayout = () => {
+export const EditingLayout = ({book, section, prayer, line}) => {
   // Homepage layout is created here.
   // Do not put state handling here (Graphql, useState, etc.)
   return (
@@ -50,7 +50,13 @@ export const EditingLayout = () => {
       justifyContent="center"
     >
       <NoSSR>
-        <TipTap content={defaultContent} prayerId={1} id={null} />
+        {/* <TipTapProse content={defaultContent} prayerId={1} /> */}
+        {!book && <EditPrayerbooks />}
+        {/* {book && !section && <EditSections bookSlug={book} />}
+        {book && section && !prayer && <EditPrayers bookSlug={book} sectionSlug={section} />}
+        {book && section && prayer && (
+          <EditSinglePrayer bookSlug={book} sectionSlug={section} prayerSlug={prayer} />
+        )} */}
       </NoSSR>
     </Box>
   )

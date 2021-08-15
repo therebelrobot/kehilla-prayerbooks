@@ -11,7 +11,7 @@ export const EditingHandler = () => {
   const router = useRouter()
   const {query} = router
   const {bookPath = []} = query
-  const [book, section] = bookPath as string[]
+  const [book, section, prayer, line] = bookPath as string[]
   console.log(book, section)
   // fetch book and section from hasura
 
