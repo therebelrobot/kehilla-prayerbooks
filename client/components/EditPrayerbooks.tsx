@@ -1,7 +1,7 @@
 import React, {FC} from 'react'
 
 import {kebabCase} from 'case-anything'
-import {Field, Form, Formik} from 'formik'
+import {Field, Form, Formik, useFormikContext} from 'formik'
 import isUrl from 'is-url'
 import Link from 'next/link'
 import {CgTrash} from 'react-icons/cg'
@@ -34,6 +34,8 @@ const statusColors = {
 
 const EditOrDisplayBook = ({book, editingId, setEditingId}) => {
   const {updateBook} = useUpdateBook(book.id)
+  const formikContext = useFormikContext()
+  console.log({formikContext})
   if (editingId === book.id) {
     const validateSlug = (value) => {
       let error
@@ -60,6 +62,7 @@ const EditOrDisplayBook = ({book, editingId, setEditingId}) => {
             slug: book.slug,
             status: book.status,
             pdfLink: book.pdf_link,
+            _submit: null,
           }}
           onSubmit={(values, actions) => {
             updateBook({
@@ -71,9 +74,20 @@ const EditOrDisplayBook = ({book, editingId, setEditingId}) => {
                   pdf_link: values.pdfLink,
                 },
               },
-            }).then(() => {
-              setEditingId(null)
             })
+              .then(() => {
+                actions.setFieldError('_submit', null)
+                setEditingId(null)
+              })
+              .catch((err) => {
+                console.error(err)
+                console.log({actions})
+                actions.setSubmitting(false)
+                actions.setFieldError(
+                  '_submit',
+                  'Something went wrong. (Do you have permission to do that?)'
+                )
+              })
           }}
         >
           {(props) => (
@@ -151,6 +165,14 @@ const EditOrDisplayBook = ({book, editingId, setEditingId}) => {
                   </FormControl>
                 )}
               </Field>
+              <Field name="_submit">
+                {({field, form}) => (
+                  <FormControl isInvalid={form.errors._submit}>
+                    <FormErrorMessage>{form.errors._submit}</FormErrorMessage>
+                  </FormControl>
+                )}
+              </Field>
+              {/*  */}
               <Button mt={4} colorScheme="teal" isLoading={props.isSubmitting} type="submit">
                 Submit
               </Button>
@@ -174,7 +196,7 @@ const EditOrDisplayBook = ({book, editingId, setEditingId}) => {
       <ListIcon as={statusIcons[book.status]} color={`${statusColors[book.status]}.500`} />
       <Text>{book.name}</Text>
       <ChLink>
-        <Link href={`/reading/${book.slug}`}>
+        <Link href={`/editing/${book.slug}`}>
           <MdOpenInBrowser />
         </Link>
       </ChLink>

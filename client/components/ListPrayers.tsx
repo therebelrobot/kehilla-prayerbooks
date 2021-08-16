@@ -42,11 +42,14 @@ export const ListPrayers: FC<ListPrayersProps> = ({bookSlug, sectionSlug}) => {
           <IconButton
             icon={<CgChevronLeftO />}
             size="xs"
-            aria-label={`return to ${data.prayerbooks[0].sections[0].name}`}
+            aria-label={`return to List of prayerbooks`}
           />
         </Link>
         <Spacer boxSize="8px" />
-        {data.prayerbooks[0].sections[0].name} Prayers
+        {data.prayerbooks[0].name}
+      </Heading>
+      <Heading size="sm" display="flex" flexDirection="row" alignItems="center">
+        {data.prayerbooks[0].sections[0].name}
       </Heading>
       <List spacing={3}>
         {prayers.map((prayer) => {

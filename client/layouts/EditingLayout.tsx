@@ -5,6 +5,8 @@ import NoSSR from 'react-no-ssr'
 import {Box} from '@chakra-ui/react'
 
 import {EditPrayerbooks} from '_/components/EditPrayerbooks'
+import {EditPrayers} from '_/components/EditPrayers'
+import {EditSections} from '_/components/EditSections'
 
 const defaultContent = `
 <h2>
@@ -52,9 +54,9 @@ export const EditingLayout = ({book, section, prayer, line}) => {
       <NoSSR>
         {/* <TipTapProse content={defaultContent} prayerId={1} /> */}
         {!book && <EditPrayerbooks />}
-        {/* {book && !section && <EditSections bookSlug={book} />}
+        {book && !section && <EditSections bookSlug={book} />}
         {book && section && !prayer && <EditPrayers bookSlug={book} sectionSlug={section} />}
-        {book && section && prayer && (
+        {/* {book && section && prayer && (
           <EditSinglePrayer bookSlug={book} sectionSlug={section} prayerSlug={prayer} />
         )} */}
       </NoSSR>

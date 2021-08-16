@@ -1,15 +1,44 @@
 import React, {FC} from 'react'
 
-import {MdClose, MdExitToApp, MdPerson} from 'react-icons/md'
+import Link from 'next/link'
+import {useRouter} from 'next/router'
+import {
+    MdChromeReaderMode, MdClose, MdExitToApp, MdModeEdit, MdPerson
+} from 'react-icons/md'
 
 import {useAuth0} from '@auth0/auth0-react'
-import {Avatar, IconButton, Spinner} from '@chakra-ui/react'
+import {Avatar, Badge, Box, IconButton, Spinner} from '@chakra-ui/react'
 
 import {useReload} from '_/services/state'
 
 interface LoginButtonProps {}
 
+const roleColors = {
+  Admin: 'red',
+  Editor: 'orange',
+}
+
+const RoleTag = ({role}) => {
+  return (
+    <Badge
+      variant="subtle"
+      colorScheme={roleColors[role]}
+      position="fixed"
+      right="32px"
+      top="0px"
+      fontFamily="Arial"
+    >
+      {role}
+    </Badge>
+  )
+}
+
 export const LoginButton: FC<LoginButtonProps> = ({}) => {
+  const router = useRouter()
+  const isEdit = router.asPath.includes('editing')
+  const path = window.location.pathname
+  console.log({path})
+  console.log({router})
   const {
     isLoading,
     isAuthenticated,
@@ -21,9 +50,13 @@ export const LoginButton: FC<LoginButtonProps> = ({}) => {
   } = useAuth0()
   const {forceReload} = useReload()
   console.log({user})
+  const [roles, setRoles] = React.useState([])
 
   React.useEffect(() => {
     if (!isAuthenticated) return
+
+    const profileRoles = user['https://prayerbooks.h4x.sh/roles']
+    setRoles(profileRoles)
     ;(async () => {
       try {
         const token = await getAccessTokenSilently({
@@ -43,24 +76,48 @@ export const LoginButton: FC<LoginButtonProps> = ({}) => {
   }
 
   return (
-    <IconButton
-      aria-label="Toggle Theme Mode"
-      icon={
-        isLoading ? (
-          <Spinner size="sm" />
-        ) : error ? (
-          <MdClose />
-        ) : isAuthenticated ? (
-          user ? (
-            <Avatar name={user.name} src={user.picture} size="sm" />
+    <>
+      {!!roles.length && (
+        <>
+          {roles.includes('Admin') ? (
+            <RoleTag role="Admin" />
+          ) : roles.includes('Editor') ? (
+            <RoleTag role="Editor" />
+          ) : null}
+        </>
+      )}
+      <IconButton
+        aria-label="Toggle Theme Mode"
+        icon={
+          isLoading ? (
+            <Spinner size="sm" />
+          ) : error ? (
+            <MdClose />
+          ) : isAuthenticated ? (
+            user ? (
+              <Avatar name={user.name} src={user.picture} size="sm" />
+            ) : (
+              <MdExitToApp />
+            )
           ) : (
-            <MdExitToApp />
+            <MdPerson />
           )
-        ) : (
-          <MdPerson />
-        )
-      }
-      onClick={() => (isAuthenticated ? fullLogout() : loginWithRedirect())}
-    />
+        }
+        onClick={() => (isAuthenticated ? fullLogout() : loginWithRedirect())}
+      />
+      {(roles.includes('Admin') || roles.includes('Editor')) && (
+        <>
+          <Box boxSize="8px" />
+          <Link
+            href={isEdit ? path.replace('editing', 'reading') : path.replace('reading', 'editing')}
+          >
+            <IconButton
+              aria-label="Toggle Theme Mode"
+              icon={isEdit ? <MdChromeReaderMode /> : <MdModeEdit />}
+            />
+          </Link>
+        </>
+      )}
+    </>
   )
 }

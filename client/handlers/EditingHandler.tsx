@@ -15,5 +15,5 @@ export const EditingHandler = () => {
   console.log(book, section)
   // fetch book and section from hasura
 
-  return React.createElement(EditingLayout, {})
+  return React.createElement(EditingLayout, {book, section, prayer, line})
 }

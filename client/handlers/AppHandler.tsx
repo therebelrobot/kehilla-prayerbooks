@@ -45,7 +45,7 @@ export const AppHandler = ({Component, pageProps}) => {
       </Head>
       <Auth0Provider
         domain={'kehilla.us.auth0.com'}
-        clientId={'prSMU4xVFRZT7Dg1BCaGQcu12PIhovis'}
+        clientId={'xhuzONOiJOaJBnukhbiPoqHxCSJqvGRa'}
         redirectUri={'http://localhost:9797/'}
         audience={'https://prayerbooks.auth/'}
       >

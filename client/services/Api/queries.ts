@@ -2,6 +2,14 @@ import {gql, useMutation, useQuery} from '@apollo/client'
 
 import {localStorage} from '_/utils/localStorage'
 
+const contextIfTokenPresent = () => {
+  const token = localStorage().getItem('auth_token')
+  if (!token) return undefined
+  return {
+    context: {headers: {authorization: `Bearer ${token}`}},
+  }
+}
+
 const GREETING_LOCATION_QUERY = gql`
   query GreetingLocationQuery {
     greetingLocation {
@@ -25,9 +33,7 @@ const LIST_PRAYERBOOKS_QUERY = gql`
   }
 `
 export const useListPrayerbooks = () => {
-  const {data, ...rest} = useQuery(LIST_PRAYERBOOKS_QUERY, {
-    context: {headers: {authorization: `Bearer ${localStorage().getItem('auth_token')}`}},
-  })
+  const {data, ...rest} = useQuery(LIST_PRAYERBOOKS_QUERY, contextIfTokenPresent())
   let books = data
   if (data) {
     books = data.prayerbooks.map((pb) => {
@@ -63,16 +69,18 @@ const UPDATE_PROSE_MUTATION = gql`
   }
 `
 export const useUpdateProse = () => {
-  const [updateProse, {loading, error, data}] = useMutation(UPDATE_PROSE_MUTATION, {
-    context: {headers: {authorization: `Bearer ${localStorage().getItem('auth_token')}`}},
-  })
+  const [updateProse, {loading, error, data}] = useMutation(
+    UPDATE_PROSE_MUTATION,
+    contextIfTokenPresent()
+  )
 
   return {updateProse, loading, error, data}
 }
 export const useInsertProse = () => {
-  const [insertProse, {loading, error, data}] = useMutation(INSERT_PROSE_MUTATION, {
-    context: {headers: {authorization: `Bearer ${localStorage().getItem('auth_token')}`}},
-  })
+  const [insertProse, {loading, error, data}] = useMutation(
+    INSERT_PROSE_MUTATION,
+    contextIfTokenPresent()
+  )
   return {insertProse, loading, error, data}
 }
 
@@ -99,8 +107,8 @@ const GET_SECTIONS_BY_BOOK_SLUG_QUERY = gql`
 export const useGetSectionsByBookSlug = (bookSlug) => {
   console.log('useGetSectionsByBookSlug', bookSlug)
   const {data, ...rest} = useQuery(GET_SECTIONS_BY_BOOK_SLUG_QUERY, {
+    ...contextIfTokenPresent(),
     variables: {bookSlug},
-    context: {headers: {authorization: `Bearer ${localStorage().getItem('auth_token')}`}},
   })
 
   let sections = []
@@ -139,8 +147,8 @@ const GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY = gql`
 export const useGetPrayersBySectionAndBookSlug = (bookSlug, sectionSlug) => {
   console.log('useGetSectionsByBookSlug', bookSlug)
   const {data, ...rest} = useQuery(GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY, {
+    ...contextIfTokenPresent(),
     variables: {bookSlug, sectionSlug},
-    context: {headers: {authorization: `Bearer ${localStorage().getItem('auth_token')}`}},
   })
 
   let prayers = []
@@ -191,8 +199,8 @@ const GET_PRAYERS_PROSE_AND_LINES = gql`
 export const useGetProseAndLines = (bookSlug, sectionSlug, prayerSlug) => {
   console.log('useGetSectionsByBookSlug', bookSlug)
   const {data, ...rest} = useQuery(GET_PRAYERS_PROSE_AND_LINES, {
+    ...contextIfTokenPresent(),
     variables: {bookSlug, sectionSlug, prayerSlug},
-    context: {headers: {authorization: `Bearer ${localStorage().getItem('auth_token')}`}},
   })
 
   let prose = []
@@ -239,7 +247,7 @@ const UPDATE_BOOK_MUTATION = gql`
 `
 export const useUpdateBook = (bookId) => {
   const [updateBook, {loading, error, data}] = useMutation(UPDATE_BOOK_MUTATION, {
-    context: {headers: {authorization: `Bearer ${localStorage().getItem('auth_token')}`}},
+    ...contextIfTokenPresent(),
     variables: {bookId},
     refetchQueries: [{query: LIST_PRAYERBOOKS_QUERY}],
   })
@@ -248,8 +256,87 @@ export const useUpdateBook = (bookId) => {
 }
 export const useInsertBook = () => {
   const [insertBook, {loading, error, data}] = useMutation(INSERT_BOOK_MUTATION, {
-    context: {headers: {authorization: `Bearer ${localStorage().getItem('auth_token')}`}},
+    ...contextIfTokenPresent(),
     refetchQueries: [{query: LIST_PRAYERBOOKS_QUERY}],
   })
   return {insertBook, loading, error, data}
+}
+
+const INSERT_SECTION_MUTATION = gql`
+  mutation InsertBookMutation(
+    $name: String = ""
+    $pdf_page: Int = 0
+    $slug: String = ""
+    $book_slug: String = ""
+  ) {
+    insert_sections(
+      objects: [{name: $name, pdf_page: $pdf_page, slug: $slug, book_slug: $book_slug}]
+    ) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+  }
+`
+const UPDATE_SECTION_MUTATION = gql`
+  mutation MyMutation($_set: sections_set_input = {}, $sectionId: Int = 10) {
+    update_sections(where: {id: {_eq: $sectionId}}, _set: $_set) {
+      affected_rows
+    }
+  }
+`
+export const useUpdateSection = (sectionId, bookSlug) => {
+  const [updateSection, {loading, error, data}] = useMutation(UPDATE_SECTION_MUTATION, {
+    ...contextIfTokenPresent(),
+    variables: {sectionId},
+    refetchQueries: [{query: GET_SECTIONS_BY_BOOK_SLUG_QUERY, variables: {bookSlug}}],
+  })
+
+  return {updateSection, loading, error, data}
+}
+export const useInsertSection = (bookSlug) => {
+  const [insertSection, {loading, error, data}] = useMutation(INSERT_SECTION_MUTATION, {
+    ...contextIfTokenPresent(),
+    refetchQueries: [{query: GET_SECTIONS_BY_BOOK_SLUG_QUERY, variables: {bookSlug}}],
+  })
+  return {insertSection, loading, error, data}
+}
+
+const INSERT_PRAYER_MUTATION = gql`
+  mutation InsertBookMutation($name: String = "", $slug: String = "", $section_slug: String = "") {
+    insert_prayers(objects: [{name: $name, slug: $slug, section_slug: $section_slug}]) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+  }
+`
+const UPDATE_PRAYER_MUTATION = gql`
+  mutation MyMutation($_set: prayers_set_input = {}, $prayerId: Int = 10) {
+    update_prayers(where: {id: {_eq: $prayerId}}, _set: $_set) {
+      affected_rows
+    }
+  }
+`
+export const useUpdatePrayer = (prayerId, bookSlug, sectionSlug) => {
+  const [updatePrayer, {loading, error, data}] = useMutation(UPDATE_PRAYER_MUTATION, {
+    ...contextIfTokenPresent(),
+    variables: {prayerId},
+    refetchQueries: [
+      {query: GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY, variables: {bookSlug, sectionSlug}},
+    ],
+  })
+
+  return {updatePrayer, loading, error, data}
+}
+export const useInsertPrayer = (bookSlug, sectionSlug) => {
+  const [insertPrayer, {loading, error, data}] = useMutation(INSERT_PRAYER_MUTATION, {
+    ...contextIfTokenPresent(),
+    refetchQueries: [
+      {query: GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY, variables: {bookSlug, sectionSlug}},
+    ],
+  })
+  return {insertPrayer, loading, error, data}
 }
