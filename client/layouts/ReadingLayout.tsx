@@ -1,7 +1,5 @@
-import * as React from 'react'
-
 import {Box} from '@chakra-ui/react'
-
+import * as React from 'react'
 import {ListPrayerbooks} from '_/components/ListPrayerbooks'
 import {ListPrayers} from '_/components/ListPrayers'
 import {ListSections} from '_/components/ListSections'
@@ -11,14 +9,7 @@ export const ReadingLayout = ({book, section, prayer, line}) => {
   // Homepage layout is created here.
   // Do not put state handling here (Graphql, useState, etc.)
   return (
-    <Box
-      width="100%"
-      height="100%"
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="center"
-    >
+    <Box width="100%" display="flex" flexDirection="column" alignItems="center" paddingY="64px">
       {!book && <ListPrayerbooks />}
       {book && !section && <ListSections bookSlug={book} />}
       {book && section && !prayer && <ListPrayers bookSlug={book} sectionSlug={section} />}

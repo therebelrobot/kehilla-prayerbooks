@@ -44,45 +44,6 @@ export const useListPrayerbooks = () => {
   return {...rest, books}
 }
 
-const INSERT_PROSE_MUTATION = gql`
-  mutation InsertProseMutation($prayer_id: Int, $tiptap_content: jsonb) {
-    insert_prose(
-      objects: [{prayer_id: $prayer_id, tiptap_content: $tiptap_content}]
-      on_conflict: {constraint: prose_pkey, update_columns: [tiptap_content]}
-    ) {
-      affected_rows
-      returning {
-        id
-      }
-    }
-  }
-`
-const UPDATE_PROSE_MUTATION = gql`
-  mutation UpdateProseMutation($id: Int, $prayer_id: Int, $tiptap_content: jsonb) {
-    update_prose(where: {id: {_eq: $id}}, _set: {tiptap_content: $tiptap_content}) {
-      affected_rows
-      returning {
-        id
-      }
-    }
-  }
-`
-export const useUpdateProse = () => {
-  const [updateProse, {loading, error, data}] = useMutation(
-    UPDATE_PROSE_MUTATION,
-    contextIfTokenPresent()
-  )
-
-  return {updateProse, loading, error, data}
-}
-export const useInsertProse = () => {
-  const [insertProse, {loading, error, data}] = useMutation(
-    INSERT_PROSE_MUTATION,
-    contextIfTokenPresent()
-  )
-  return {insertProse, loading, error, data}
-}
-
 const GET_SECTIONS_BY_BOOK_SLUG_QUERY = gql`
   query GetSectionsByBookSlugQuery($bookSlug: String!) {
     prayerbooks(where: {slug: {_eq: $bookSlug}}) {
@@ -117,7 +78,7 @@ export const useGetSectionsByBookSlug = (bookSlug) => {
   return {...rest, data, sections}
 }
 
-const GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY = gql`
+export const GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY = gql`
   query GetPrayersBySectionAndBookSlugQuery($bookSlug: String!, $sectionSlug: String!) {
     prayerbooks(where: {slug: {_eq: $bookSlug}}) {
       name
@@ -157,7 +118,7 @@ export const useGetPrayersBySectionAndBookSlug = (bookSlug, sectionSlug) => {
   return {...rest, data, prayers}
 }
 
-const GET_PRAYERS_PROSE_AND_LINES = gql`
+export const GET_PRAYERS_PROSE_AND_LINES = gql`
   query GetPrayersProseAndLines($bookSlug: String!, $sectionSlug: String!, $prayerSlug: String!) {
     prayerbooks(where: {slug: {_eq: $bookSlug}}) {
       name
@@ -205,19 +166,24 @@ export const useGetProseAndLines = (bookSlug, sectionSlug, prayerSlug) => {
   let prose = []
   let lines = []
   let order = []
+  let prayerId = null
   if (data) {
+    prayerId = data.prayerbooks[0].sections[0].prayers[0].id
     prose = data.prayerbooks[0].sections[0].prayers[0].proses
     lines = data.prayerbooks[0].sections[0].prayers[0].lines
-    order = data.prayerbooks[0].sections[0].prayers[0].line_prose_order || []
+    order = data.prayerbooks[0].sections[0].prayers[0].line_prose_order
   }
+  console.log({prose})
   const ordered = order.map((typeId) => {
     const [type, id] = typeId.split('-')
     if (type === 'prose') {
-      return prose.find((p) => (p.id = Number(id)))
+      const foundProse = prose.find((p) => p.id === Number(id))
+      console.log({foundProse, prose})
+      return {...foundProse, type}
     }
-    return lines.find((l) => (l.id = Number(id)))
+    return {...lines.find((l) => l.id === Number(id)), type}
   })
-  return {...rest, data, prose, lines, ordered}
+  return {...rest, data, prose, lines, ordered, lineProseOrder: order, prayerId}
 }
 
 const INSERT_BOOK_MUTATION = gql`
@@ -358,12 +324,15 @@ const REMOVE_PRAYER_MUTATION = gql`
     }
   }
 `
-export const useUpdatePrayer = (prayerId, bookSlug, sectionSlug) => {
+export const useUpdatePrayer = (prayerId, bookSlug, sectionSlug, prayerSlug = '') => {
   const [updatePrayer, {loading, error, data}] = useMutation(UPDATE_PRAYER_MUTATION, {
     ...contextIfTokenPresent(),
     variables: {prayerId},
     refetchQueries: [
       {query: GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY, variables: {bookSlug, sectionSlug}},
+      ...(prayerSlug.length
+        ? [{query: GET_PRAYERS_PROSE_AND_LINES, variables: {bookSlug, sectionSlug, prayerSlug}}]
+        : []),
     ],
   })
 
@@ -388,4 +357,50 @@ export const useRemovePrayer = (prayerId, bookSlug, sectionSlug) => {
   })
 
   return {removePrayer, loading, error, data}
+}
+
+const INSERT_PROSE_MUTATION = gql`
+  mutation InsertProseMutation($prayer_slug: String, $tiptap_content: jsonb) {
+    insert_prose(
+      objects: [{prayer_slug: $prayer_slug, tiptap_content: $tiptap_content}]
+      on_conflict: {constraint: prose_pkey, update_columns: [tiptap_content]}
+    ) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+  }
+`
+const UPDATE_PROSE_MUTATION = gql`
+  mutation UpdateProseMutation($id: Int, $tiptap_content: jsonb) {
+    update_prose(where: {id: {_eq: $id}}, _set: {tiptap_content: $tiptap_content}) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+  }
+`
+
+export const useInsertProse = (bookSlug, sectionSlug, prayerSlug) => {
+  const [insertProse, {loading, error, data}] = useMutation(INSERT_PROSE_MUTATION, {
+    ...contextIfTokenPresent(),
+    variables: {prayer_slug: prayerSlug},
+    refetchQueries: [
+      {query: GET_PRAYERS_PROSE_AND_LINES, variables: {bookSlug, sectionSlug, prayerSlug}},
+    ],
+  })
+  return {insertProse, loading, error, data}
+}
+
+export const useUpdateProse = (bookSlug, sectionSlug, prayerSlug) => {
+  const [updateProse, {loading, error, data}] = useMutation(UPDATE_PROSE_MUTATION, {
+    ...contextIfTokenPresent(),
+    refetchQueries: [
+      {query: GET_PRAYERS_PROSE_AND_LINES, variables: {bookSlug, sectionSlug, prayerSlug}},
+    ],
+  })
+
+  return {updateProse, loading, error, data}
 }

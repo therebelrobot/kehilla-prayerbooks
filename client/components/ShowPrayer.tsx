@@ -1,14 +1,4 @@
-import React, {FC} from 'react'
-
-import NLink from 'next/link'
-import {CgChevronLeftO} from 'react-icons/cg'
-import {
-    MdCancel, MdNewReleases, MdPauseCircleFilled, MdSwapVerticalCircle
-} from 'react-icons/md'
-
-import {
-    Box, Heading as ChHeading, IconButton, List, Spacer
-} from '@chakra-ui/react'
+import {Box, Container, Heading as ChHeading, IconButton, List, Spacer} from '@chakra-ui/react'
 import Blockquote from '@tiptap/extension-blockquote'
 import Bold from '@tiptap/extension-bold'
 import BulletList from '@tiptap/extension-bullet-list'
@@ -38,7 +28,10 @@ import TextAlign from '@tiptap/extension-text-align'
 import TextStyle from '@tiptap/extension-text-style'
 import Underline from '@tiptap/extension-underline'
 import {generateHTML} from '@tiptap/html'
-
+import NLink from 'next/link'
+import React, {FC} from 'react'
+import {CgChevronLeftO} from 'react-icons/cg'
+import {MdCancel, MdNewReleases, MdPauseCircleFilled, MdSwapVerticalCircle} from 'react-icons/md'
 import {useGetProseAndLines} from '_/services/Api/queries'
 
 interface ShowPrayerProps {
@@ -82,51 +75,56 @@ export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSl
         <Spacer boxSize="8px" />
         {data.prayerbooks[0].sections[0].prayers[0].name}
       </ChHeading>
-      <List spacing={3}>
-        {prose.map((pr, index) => {
-          if (!pr.tiptap_content) return null
-          const content = generateHTML(pr.tiptap_content, [
-            Document,
-            Paragraph,
-            Text,
-            Bold,
-            Heading,
-            Image,
-            Link,
-            ListItem,
-            BulletList,
-            OrderedList,
-            CodeBlock,
-            Italic,
-            Code,
-            HorizontalRule,
-            Blockquote,
-            HardBreak,
-            Strike,
-            Table,
-            Underline,
-            TextAlign,
-            Mention,
-            Highlight,
-            TextStyle,
-            Superscript,
-            Subscript,
-            TableRow,
-            TableCell,
-            TableHeader,
-          ])
-          console.log(content, typeof content)
-          return (
-            <Box
-              key={`prose-${index}`}
-              className="ProseMirror"
-              dangerouslySetInnerHTML={{
-                __html: content,
-              }}
-            />
-          )
-        })}
-      </List>
+      <Container>
+        <List spacing={3}>
+          {ordered.map((item, index) => {
+            if (item.type === 'prose') {
+              if (!item.tiptap_content) return null
+              const content = generateHTML(item.tiptap_content, [
+                Document,
+                Paragraph,
+                Text,
+                Bold,
+                Heading,
+                Image,
+                Link,
+                ListItem,
+                BulletList,
+                OrderedList,
+                CodeBlock,
+                Italic,
+                Code,
+                HorizontalRule,
+                Blockquote,
+                HardBreak,
+                Strike,
+                Table,
+                Underline,
+                TextAlign,
+                Mention,
+                Highlight,
+                TextStyle,
+                Superscript,
+                Subscript,
+                TableRow,
+                TableCell,
+                TableHeader,
+              ])
+              console.log(content, typeof content)
+              return (
+                <Box
+                  key={`prose-${item.id}`}
+                  className="ProseMirror"
+                  dangerouslySetInnerHTML={{
+                    __html: content,
+                  }}
+                />
+              )
+            }
+            return null
+          })}
+        </List>
+      </Container>
     </>
   )
 }

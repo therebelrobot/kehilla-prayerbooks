@@ -1,12 +1,10 @@
-import * as React from 'react'
-
-import NoSSR from 'react-no-ssr'
-
 import {Box} from '@chakra-ui/react'
-
+import * as React from 'react'
+import NoSSR from 'react-no-ssr'
 import {EditPrayerbooks} from '_/components/EditPrayerbooks'
 import {EditPrayers} from '_/components/EditPrayers'
 import {EditSections} from '_/components/EditSections'
+import {EditSinglePrayer} from '_/components/EditSinglePrayer'
 
 const defaultContent = `
 <h2>
@@ -43,22 +41,15 @@ export const EditingLayout = ({book, section, prayer, line}) => {
   // Homepage layout is created here.
   // Do not put state handling here (Graphql, useState, etc.)
   return (
-    <Box
-      width="100%"
-      height="100%"
-      display="flex"
-      flexDirection="column"
-      alignItems="center"
-      justifyContent="center"
-    >
+    <Box width="100%" display="flex" flexDirection="column" alignItems="center" paddingY="64px">
       <NoSSR>
         {/* <TipTapProse content={defaultContent} prayerId={1} /> */}
         {!book && <EditPrayerbooks />}
         {book && !section && <EditSections bookSlug={book} />}
         {book && section && !prayer && <EditPrayers bookSlug={book} sectionSlug={section} />}
-        {/* {book && section && prayer && (
+        {book && section && prayer && (
           <EditSinglePrayer bookSlug={book} sectionSlug={section} prayerSlug={prayer} />
-        )} */}
+        )}
       </NoSSR>
     </Box>
   )
