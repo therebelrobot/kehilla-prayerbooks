@@ -1,5 +1,4 @@
 import {gql, useMutation, useQuery} from '@apollo/client'
-
 import {localStorage} from '_/utils/localStorage'
 
 const contextIfTokenPresent = () => {
@@ -239,8 +238,15 @@ const INSERT_BOOK_MUTATION = gql`
   }
 `
 const UPDATE_BOOK_MUTATION = gql`
-  mutation MyMutation($_set: prayerbooks_set_input = {}, $bookId: Int = 10) {
+  mutation UpdateBookMutation($_set: prayerbooks_set_input = {}, $bookId: Int = 0) {
     update_prayerbooks(where: {id: {_eq: $bookId}}, _set: $_set) {
+      affected_rows
+    }
+  }
+`
+const REMOVE_BOOK_MUTATION = gql`
+  mutation RemoveBookMutation($bookId: Int = 0) {
+    delete_prayerbooks(where: {id: {_eq: $bookId}}) {
       affected_rows
     }
   }
@@ -261,6 +267,15 @@ export const useInsertBook = () => {
   })
   return {insertBook, loading, error, data}
 }
+export const useRemoveBook = (bookId) => {
+  const [removeBook, {loading, error, data}] = useMutation(REMOVE_BOOK_MUTATION, {
+    ...contextIfTokenPresent(),
+    variables: {bookId},
+    refetchQueries: [{query: LIST_PRAYERBOOKS_QUERY}],
+  })
+
+  return {removeBook, loading, error, data}
+}
 
 const INSERT_SECTION_MUTATION = gql`
   mutation InsertBookMutation(
@@ -280,8 +295,15 @@ const INSERT_SECTION_MUTATION = gql`
   }
 `
 const UPDATE_SECTION_MUTATION = gql`
-  mutation MyMutation($_set: sections_set_input = {}, $sectionId: Int = 10) {
+  mutation UpdateSectionMutation($_set: sections_set_input = {}, $sectionId: Int = 10) {
     update_sections(where: {id: {_eq: $sectionId}}, _set: $_set) {
+      affected_rows
+    }
+  }
+`
+const REMOVE_SECTION_MUTATION = gql`
+  mutation RemoveSectionMutation($sectionId: Int = 10) {
+    delete_sections(where: {id: {_eq: $sectionId}}) {
       affected_rows
     }
   }
@@ -302,6 +324,15 @@ export const useInsertSection = (bookSlug) => {
   })
   return {insertSection, loading, error, data}
 }
+export const useRemoveSection = (sectionId, bookSlug) => {
+  const [removeSection, {loading, error, data}] = useMutation(REMOVE_SECTION_MUTATION, {
+    ...contextIfTokenPresent(),
+    variables: {sectionId},
+    refetchQueries: [{query: GET_SECTIONS_BY_BOOK_SLUG_QUERY, variables: {bookSlug}}],
+  })
+
+  return {removeSection, loading, error, data}
+}
 
 const INSERT_PRAYER_MUTATION = gql`
   mutation InsertBookMutation($name: String = "", $slug: String = "", $section_slug: String = "") {
@@ -314,8 +345,15 @@ const INSERT_PRAYER_MUTATION = gql`
   }
 `
 const UPDATE_PRAYER_MUTATION = gql`
-  mutation MyMutation($_set: prayers_set_input = {}, $prayerId: Int = 10) {
+  mutation UpdatePrayerMutation($_set: prayers_set_input = {}, $prayerId: Int = 10) {
     update_prayers(where: {id: {_eq: $prayerId}}, _set: $_set) {
+      affected_rows
+    }
+  }
+`
+const REMOVE_PRAYER_MUTATION = gql`
+  mutation RemovePrayerMutation($prayerId: Int = 10) {
+    delete_prayers(where: {id: {_eq: $prayerId}}) {
       affected_rows
     }
   }
@@ -339,4 +377,15 @@ export const useInsertPrayer = (bookSlug, sectionSlug) => {
     ],
   })
   return {insertPrayer, loading, error, data}
+}
+export const useRemovePrayer = (prayerId, bookSlug, sectionSlug) => {
+  const [removePrayer, {loading, error, data}] = useMutation(REMOVE_PRAYER_MUTATION, {
+    ...contextIfTokenPresent(),
+    variables: {prayerId},
+    refetchQueries: [
+      {query: GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY, variables: {bookSlug, sectionSlug}},
+    ],
+  })
+
+  return {removePrayer, loading, error, data}
 }

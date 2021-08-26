@@ -1,12 +1,7 @@
-import React, {FC} from 'react'
-
-import Link from 'next/link'
-import {
-    MdCancel, MdNewReleases, MdPauseCircleFilled, MdSwapVerticalCircle
-} from 'react-icons/md'
-
 import {Link as ChLink, List, ListIcon, ListItem} from '@chakra-ui/react'
-
+import Link from 'next/link'
+import React, {FC} from 'react'
+import {MdCancel, MdNewReleases, MdPauseCircleFilled, MdSwapVerticalCircle} from 'react-icons/md'
 import {useListPrayerbooks} from '_/services/Api/queries'
 
 interface ListPrayerbooksProps {}

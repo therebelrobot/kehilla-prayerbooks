@@ -1,15 +1,8 @@
-import React, {FC} from 'react'
-
+import {Box, Heading, IconButton, Link as ChLink, List, ListItem, Spacer} from '@chakra-ui/react'
 import Link from 'next/link'
+import React, {FC} from 'react'
 import {CgChevronLeftO} from 'react-icons/cg'
-import {
-    MdCancel, MdNewReleases, MdPauseCircleFilled, MdSwapVerticalCircle
-} from 'react-icons/md'
-
-import {
-    Heading, IconButton, Link as ChLink, List, ListItem, Spacer
-} from '@chakra-ui/react'
-
+import {MdCancel, MdNewReleases, MdPauseCircleFilled, MdSwapVerticalCircle} from 'react-icons/md'
 import {useGetPrayersBySectionAndBookSlug} from '_/services/Api/queries'
 
 interface ListPrayersProps {
@@ -51,6 +44,11 @@ export const ListPrayers: FC<ListPrayersProps> = ({bookSlug, sectionSlug}) => {
       <Heading size="sm" display="flex" flexDirection="row" alignItems="center">
         {data.prayerbooks[0].sections[0].name}
       </Heading>
+
+      <Box width="100%" mt="16px" mb="16px">
+        {' '}
+        <hr />
+      </Box>
       <List spacing={3}>
         {prayers.map((prayer) => {
           return (
