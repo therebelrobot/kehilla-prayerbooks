@@ -6,7 +6,7 @@ import {
 } from 'react-icons/md'
 
 import {
-    Box, Heading, Link as ChLink, List, ListIcon, ListItem
+    Box, Container, Heading, Link as ChLink, List, ListIcon, ListItem, Text
 } from '@chakra-ui/react'
 
 import {useListPrayerbooks} from '_/services/Api/queries'
@@ -34,7 +34,17 @@ export const ListPrayerbooks: FC<ListPrayerbooksProps> = ({}) => {
   return (
     <>
       <Heading>Kehilla Prayerbooks</Heading>
-      <Heading size="sm">An unofficial digitized version.</Heading>
+      <Heading size="sm">An unofficial digitized library.</Heading>
+      <Container>
+        <Text as="i" fontSize="sm">
+          This is a side-project of Aster Haven, a digital version of Kehilla Community Synagogue's
+          online prayerbook PDFs. It is not official, by any means, and is not necessarily endorsed
+          by Kehilla. I made this more so I can follow along easier during services. If you find a
+          bug or you're interested in helping out, please contact Aster (
+          <ChLink href="mailto:kehilla@aster.hn">kehilla@aster.hn</ChLink>) to get access/report
+          bugs.
+        </Text>
+      </Container>
       <Box width="100%" height="32px" borderBottomWidth="1px" marginBottom="32px" />
       <List spacing={3}>
         {books.map((book) => {

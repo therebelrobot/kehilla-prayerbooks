@@ -1,26 +1,17 @@
-import {Box, Heading, IconButton, Link as ChLink, List, ListItem, Spacer} from '@chakra-ui/react'
-import Link from 'next/link'
 import React, {FC} from 'react'
+
+import Link from 'next/link'
 import {CgChevronLeftO} from 'react-icons/cg'
-import {MdCancel, MdNewReleases, MdPauseCircleFilled, MdSwapVerticalCircle} from 'react-icons/md'
+
+import {
+    Box, Heading, IconButton, Link as ChLink, List, ListItem, Spacer
+} from '@chakra-ui/react'
+
 import {useGetPrayersBySectionAndBookSlug} from '_/services/Api/queries'
 
 interface ListPrayersProps {
   bookSlug: string
   sectionSlug: string
-}
-
-const statusIcons = {
-  UNSTARTED: MdCancel,
-  IN_PROGRESS: MdSwapVerticalCircle,
-  STALLED: MdPauseCircleFilled,
-  COMPLETE: MdNewReleases,
-}
-const statusColors = {
-  UNSTARTED: 'gray',
-  IN_PROGRESS: 'orange',
-  STALLED: 'red',
-  COMPLETE: 'green',
 }
 
 export const ListPrayers: FC<ListPrayersProps> = ({bookSlug, sectionSlug}) => {
