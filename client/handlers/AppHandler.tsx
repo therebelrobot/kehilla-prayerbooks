@@ -1,7 +1,6 @@
 import React from 'react'
 
 import Head from 'next/head'
-import NoSSR from 'react-no-ssr'
 
 import {Auth0Provider} from '@auth0/auth0-react'
 import {ChakraProvider, CSSReset, extendTheme} from '@chakra-ui/react'
@@ -26,7 +25,7 @@ export const AppHandler = ({Component, pageProps}) => {
   })
 
   return (
-    <NoSSR>
+    <>
       <Head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -56,7 +55,7 @@ export const AppHandler = ({Component, pageProps}) => {
       <Auth0Provider
         domain={'kehilla.us.auth0.com'}
         clientId={'xhuzONOiJOaJBnukhbiPoqHxCSJqvGRa'}
-        redirectUri={'http://localhost:9797/'}
+        redirectUri={`${window.location.protocol}//${window.location.host}/`}
         audience={'https://prayerbooks.auth/'}
       >
         <ApiProvider initialState={pageProps.initialApolloState}>
@@ -68,6 +67,6 @@ export const AppHandler = ({Component, pageProps}) => {
           </ChakraProvider>
         </ApiProvider>
       </Auth0Provider>
-    </NoSSR>
+    </>
   )
 }
