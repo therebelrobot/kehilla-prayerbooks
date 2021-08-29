@@ -44,6 +44,13 @@ export const ListPrayerbooks: FC<ListPrayerbooksProps> = ({}) => {
           <ChLink href="mailto:kehilla@aster.hn">kehilla@aster.hn</ChLink>) to get access/report
           bugs.
         </Text>
+        <Text>
+          For the original prayerbooks, see{' '}
+          <ChLink href="http://kehillasynagogue.org/prayerbooks/">
+            Kehilla's Official Website
+          </ChLink>
+          .
+        </Text>
       </Container>
       <Box width="100%" height="32px" borderBottomWidth="1px" marginBottom="32px" />
       <List spacing={3}>
@@ -54,6 +61,10 @@ export const ListPrayerbooks: FC<ListPrayerbooksProps> = ({}) => {
               <Link href={`/reading/${book.slug}`}>
                 <ChLink>{book.name}</ChLink>
               </Link>
+              <Box width="8px" height="24px" borderRightWidth="1px" marginRight="8px" />
+              <ChLink fontSize="xs" href={book.pdf_link} target="_blank">
+                Original PDF
+              </ChLink>
             </ListItem>
           )
         })}
