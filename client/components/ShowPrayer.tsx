@@ -1,4 +1,15 @@
-import {Box, Container, Heading as ChHeading, IconButton, List, Spacer} from '@chakra-ui/react'
+import React, {FC} from 'react'
+
+import NLink from 'next/link'
+import {CgChevronLeftO} from 'react-icons/cg'
+import {
+    MdCancel, MdNewReleases, MdPauseCircleFilled, MdSwapVerticalCircle
+} from 'react-icons/md'
+
+import {
+    Box, Container, Heading as ChHeading, IconButton, List, Spacer,
+    Text as ChText
+} from '@chakra-ui/react'
 import Blockquote from '@tiptap/extension-blockquote'
 import Bold from '@tiptap/extension-bold'
 import BulletList from '@tiptap/extension-bullet-list'
@@ -28,10 +39,8 @@ import TextAlign from '@tiptap/extension-text-align'
 import TextStyle from '@tiptap/extension-text-style'
 import Underline from '@tiptap/extension-underline'
 import {generateHTML} from '@tiptap/html'
-import NLink from 'next/link'
-import React, {FC} from 'react'
-import {CgChevronLeftO} from 'react-icons/cg'
-import {MdCancel, MdNewReleases, MdPauseCircleFilled, MdSwapVerticalCircle} from 'react-icons/md'
+
+import {SessionUpdater} from '_/components/SessionUpdater'
 import {useGetProseAndLines} from '_/services/Api/queries'
 
 interface ShowPrayerProps {
@@ -75,6 +84,8 @@ export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSl
         <Spacer boxSize="8px" />
         {data.prayerbooks[0].sections[0].prayers[0].name}
       </ChHeading>
+      <Box height="32px" width="100%" flexShrink={0} />
+
       <Container>
         <List spacing={3}>
           {ordered.map((item, index) => {
@@ -112,13 +123,52 @@ export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSl
               ])
               console.log(content, typeof content)
               return (
-                <Box
-                  key={`prose-${item.id}`}
-                  className="ProseMirror"
-                  dangerouslySetInnerHTML={{
-                    __html: content,
-                  }}
-                />
+                <SessionUpdater id={item.id} type="prose">
+                  <Box
+                    key={`prose-${item.id}`}
+                    className="ProseMirror"
+                    dangerouslySetInnerHTML={{
+                      __html: content,
+                    }}
+                  />
+                </SessionUpdater>
+              )
+            } else if (item.type === 'line') {
+              return (
+                <SessionUpdater id={item.id} type="line" width="100%">
+                  <Box width="100%" display="flex" flexDirection="column">
+                    <Box
+                      width="100%"
+                      display="flex"
+                      flexDirection="row"
+                      alignItems="center"
+                      justifyContent="space-between"
+                    >
+                      {!!item.hebrew.length && (
+                        <Box>
+                          <ChText className="hebrew">{item.hebrew}</ChText>
+                        </Box>
+                      )}
+                      {!!item.transliteration.length && (
+                        <Box>
+                          <ChText as="strong">{item.transliteration}</ChText>
+                        </Box>
+                      )}
+                      {!!item.translation.length && (
+                        <Box>
+                          <ChText>{item.translation}</ChText>
+                        </Box>
+                      )}
+                    </Box>
+                    {!!item.notes.length && (
+                      <Box width="100%" display="flex" flexDirection="row" justifyContent="center">
+                        <ChText fontSize="sm" as="i">
+                          {item.notes}
+                        </ChText>
+                      </Box>
+                    )}
+                  </Box>
+                </SessionUpdater>
               )
             }
             return null

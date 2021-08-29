@@ -1,6 +1,7 @@
 import React from 'react'
 
 import Head from 'next/head'
+import NoSSR from 'react-no-ssr'
 
 import {Auth0Provider} from '@auth0/auth0-react'
 import {ChakraProvider, CSSReset, extendTheme} from '@chakra-ui/react'
@@ -25,7 +26,7 @@ export const AppHandler = ({Component, pageProps}) => {
   })
 
   return (
-    <>
+    <NoSSR>
       <Head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" />
@@ -33,6 +34,10 @@ export const AppHandler = ({Component, pageProps}) => {
           href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&display=swap"
           rel="stylesheet"
         />
+        <link
+          href="https://fonts.googleapis.com/css2?family=David+Libre:wght@400;500;700&display=swap"
+          rel="stylesheet"
+        ></link>
 
         <style>{`
           @font-face {
@@ -40,6 +45,11 @@ export const AppHandler = ({Component, pageProps}) => {
             src: url('http://dyslexicfonts.com/fonts/OpenDyslexic-Regular.otf');
             font-style: normal;
             font-weight: normal;
+          }
+          .hebrew, .hebrew span {
+            font-size: 25px;
+            font-weight: bold;
+            font-family: 'David Libre', Spectral, sans-serif;
           }
         `}</style>
       </Head>
@@ -58,6 +68,6 @@ export const AppHandler = ({Component, pageProps}) => {
           </ChakraProvider>
         </ApiProvider>
       </Auth0Provider>
-    </>
+    </NoSSR>
   )
 }

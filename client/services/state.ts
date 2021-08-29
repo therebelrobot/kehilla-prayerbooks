@@ -12,6 +12,16 @@ export interface State {
   forceReload: () => void
   activeEditId: number | null
   setActiveEditId: (id: State['activeEditId']) => void
+  startedSessionId: string | null
+  joinedSessionId: string | null
+  updateStartedSessionId: (id: State['startedSessionId']) => void
+  updateJoinedSessionId: (id: State['joinedSessionId']) => void
+  sessionPaused: boolean
+  setSessionPaused: (isPaused: State['sessionPaused']) => void
+  matchingSnippet: string | null
+  setMatchingSnippet: (snippet: State['matchingSnippet']) => void
+  readerId: string | null
+  setReaderId: (id: State['readerId']) => void
 }
 
 // defaults
@@ -44,6 +54,31 @@ const updateActiveEditId = (id: State['activeEditId'], state: State) => {
   newState.activeEditId = id
   return newState
 }
+const updateStartedSessionId = (id: State['startedSessionId'], state: State) => {
+  const newState = {...state}
+  newState.startedSessionId = id
+  return newState
+}
+const updateJoinedSessionId = (id: State['joinedSessionId'], state: State) => {
+  const newState = {...state}
+  newState.joinedSessionId = id
+  return newState
+}
+const updateSessionPaused = (isPaused: State['sessionPaused'], state: State) => {
+  const newState = {...state}
+  newState.sessionPaused = isPaused
+  return newState
+}
+const updateMatchingSnippet = (snippet: State['matchingSnippet'], state: State) => {
+  const newState = {...state}
+  newState.matchingSnippet = snippet
+  return newState
+}
+const setReaderId = (id: State['readerId'], state: State) => {
+  const newState = {...state}
+  newState.readerId = id
+  return newState
+}
 
 // selectors
 const getFriendName = (state: State) => state.friendName
@@ -65,6 +100,20 @@ export const useStore = create(
     activeEditId: null,
     setActiveEditId: (id: State['activeEditId']) =>
       set((state: State) => updateActiveEditId(id, state)),
+    startedSessionId: null,
+    joinedSessionId: null,
+    updateStartedSessionId: (id: State['startedSessionId']) =>
+      set((state: State) => updateStartedSessionId(id, state)),
+    updateJoinedSessionId: (id: State['joinedSessionId']) =>
+      set((state: State) => updateJoinedSessionId(id, state)),
+    sessionPaused: false,
+    setSessionPaused: (isPaused: State['sessionPaused']) =>
+      set((state: State) => updateSessionPaused(isPaused, state)),
+    matchingSnippet: null,
+    setMatchingSnippet: (snippet: State['matchingSnippet']) =>
+      set((state: State) => updateMatchingSnippet(snippet, state)),
+    readerId: null,
+    setReaderId: (id: State['readerId']) => set((state: State) => setReaderId(id, state)),
   })
 )
 
@@ -94,4 +143,18 @@ export const useEditing = () =>
   useStore((state: State) => ({
     activeEditId: state.activeEditId,
     setActiveEditId: state.setActiveEditId,
+  }))
+
+export const useReadingSession = () =>
+  useStore((state: State) => ({
+    startedSessionId: state.startedSessionId,
+    joinedSessionId: state.joinedSessionId,
+    updateStartedSessionId: state.updateStartedSessionId,
+    updateJoinedSessionId: state.updateJoinedSessionId,
+    sessionPaused: state.sessionPaused,
+    setSessionPaused: state.setSessionPaused,
+    matchingSnippet: state.matchingSnippet,
+    setMatchingSnippet: state.setMatchingSnippet,
+    readerId: state.readerId,
+    setReaderId: state.setReaderId,
   }))

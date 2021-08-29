@@ -1,24 +1,18 @@
-import {
-  Box,
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  ListItem,
-  Radio,
-  RadioGroup,
-} from '@chakra-ui/react'
-import {kebabCase} from 'case-anything'
-import {Field, Form, Formik, useFormikContext} from 'formik'
-import isUrl from 'is-url'
 import React from 'react'
+
+import {kebabCase} from 'case-anything'
+import {Field, Form, Formik} from 'formik'
+import isUrl from 'is-url'
+
+import {
+    Box, Button, FormControl, FormErrorMessage, FormLabel, Input, ListItem,
+    Radio, RadioGroup
+} from '@chakra-ui/react'
+
 import {useInsertBook} from '_/services/Api/queries'
 
 export const CreateBook = ({setShowCreateBook}) => {
   const {insertBook} = useInsertBook()
-  const formikContext = useFormikContext()
-  console.log({formikContext})
   const validateSlug = (value) => {
     let error
     if (!value) {

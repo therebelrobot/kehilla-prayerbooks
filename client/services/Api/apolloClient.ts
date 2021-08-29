@@ -1,19 +1,33 @@
 import {useMemo} from 'react'
 
-// from https://github.com/vercel/next.js/blob/master/examples/with-apollo/lib/apolloClient.js
-import {ApolloClient, HttpLink, InMemoryCache} from '@apollo/client'
-import {concatPagination} from '@apollo/client/utilities'
+import {ApolloClient, HttpLink, InMemoryCache, split} from '@apollo/client'
+import {WebSocketLink} from '@apollo/client/link/ws'
+import {concatPagination, getMainDefinition} from '@apollo/client/utilities'
 
 let apolloClient
 
 function createApolloClient() {
-  const link = new HttpLink({
+  const httpLink = new HttpLink({
     uri: `https://kehilla.h4x.sh/v1/graphql`,
   })
+  const wsLink = new WebSocketLink({
+    uri: 'wss://kehilla.h4x.sh/v1/graphql',
+    options: {
+      // reconnect: true,
+    },
+  })
+  const splitLink = split(
+    ({query}) => {
+      const definition = getMainDefinition(query)
+      return definition.kind === 'OperationDefinition' && definition.operation === 'subscription'
+    },
+    wsLink,
+    httpLink
+  )
 
   return new ApolloClient({
     ssrMode: typeof window === 'undefined',
-    link,
+    link: splitLink,
     cache: new InMemoryCache({
       typePolicies: {
         Query: {

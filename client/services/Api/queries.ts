@@ -1,4 +1,9 @@
-import {gql, useMutation, useQuery} from '@apollo/client'
+import {useState} from 'react'
+
+import {
+    gql, useLazyQuery, useMutation, useQuery, useSubscription
+} from '@apollo/client'
+
 import {localStorage} from '_/utils/localStorage'
 
 const contextIfTokenPresent = () => {
@@ -65,7 +70,7 @@ const GET_SECTIONS_BY_BOOK_SLUG_QUERY = gql`
 `
 
 export const useGetSectionsByBookSlug = (bookSlug) => {
-  console.log('useGetSectionsByBookSlug', bookSlug)
+  // console.log('useGetSectionsByBookSlug', bookSlug)
   const {data, ...rest} = useQuery(GET_SECTIONS_BY_BOOK_SLUG_QUERY, {
     ...contextIfTokenPresent(),
     variables: {bookSlug},
@@ -105,7 +110,7 @@ export const GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY = gql`
 `
 
 export const useGetPrayersBySectionAndBookSlug = (bookSlug, sectionSlug) => {
-  console.log('useGetSectionsByBookSlug', bookSlug)
+  // console.log('useGetSectionsByBookSlug', bookSlug)
   const {data, ...rest} = useQuery(GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY, {
     ...contextIfTokenPresent(),
     variables: {bookSlug, sectionSlug},
@@ -157,7 +162,7 @@ export const GET_PRAYERS_PROSE_AND_LINES = gql`
 `
 
 export const useGetProseAndLines = (bookSlug, sectionSlug, prayerSlug) => {
-  console.log('useGetSectionsByBookSlug', bookSlug)
+  // console.log('useGetSectionsByBookSlug', bookSlug)
   const {data, ...rest} = useQuery(GET_PRAYERS_PROSE_AND_LINES, {
     ...contextIfTokenPresent(),
     variables: {bookSlug, sectionSlug, prayerSlug},
@@ -170,15 +175,15 @@ export const useGetProseAndLines = (bookSlug, sectionSlug, prayerSlug) => {
   if (data) {
     prayerId = data.prayerbooks[0].sections[0].prayers[0].id
     prose = data.prayerbooks[0].sections[0].prayers[0].proses
-    lines = data.prayerbooks[0].sections[0].prayers[0].lines
-    order = data.prayerbooks[0].sections[0].prayers[0].line_prose_order
+    lines = data.prayerbooks[0].sections[0].prayers[0].prayer_lines
+    order = data.prayerbooks[0].sections[0].prayers[0].line_prose_order || []
   }
-  console.log({prose})
+  // console.log({prose, lines, order})
   const ordered = order.map((typeId) => {
     const [type, id] = typeId.split('-')
     if (type === 'prose') {
       const foundProse = prose.find((p) => p.id === Number(id))
-      console.log({foundProse, prose})
+      // console.log({foundProse, prose})
       return {...foundProse, type}
     }
     return {...lines.find((l) => l.id === Number(id)), type}
@@ -382,6 +387,13 @@ const UPDATE_PROSE_MUTATION = gql`
     }
   }
 `
+const REMOVE_PROSE_MUTATION = gql`
+  mutation RemoveProseMutation($id: Int = 10) {
+    delete_prose(where: {id: {_eq: $id}}) {
+      affected_rows
+    }
+  }
+`
 
 export const useInsertProse = (bookSlug, sectionSlug, prayerSlug) => {
   const [insertProse, {loading, error, data}] = useMutation(INSERT_PROSE_MUTATION, {
@@ -403,4 +415,268 @@ export const useUpdateProse = (bookSlug, sectionSlug, prayerSlug) => {
   })
 
   return {updateProse, loading, error, data}
+}
+
+export const useRemoveProse = (id, prayerSlug, sectionSlug, bookSlug) => {
+  // console.log('useRemoveProse', {id, prayerSlug, sectionSlug, bookSlug})
+  const [removeProse, {loading, error, data}] = useMutation(REMOVE_PROSE_MUTATION, {
+    ...contextIfTokenPresent(),
+    variables: {id},
+    refetchQueries: [
+      {query: GET_PRAYERS_PROSE_AND_LINES, variables: {prayerSlug, sectionSlug, bookSlug}},
+    ],
+  })
+
+  return {removeProse, loading, error, data}
+}
+
+export const INSERT_LINE_MUTATION = gql`
+  mutation InsertLineMutation(
+    $hebrew: String = ""
+    $notes: String = ""
+    $prayer_slug: String = ""
+    $translation: String = ""
+    $transliteration: String = ""
+  ) {
+    insert_prayer_lines(
+      objects: {
+        hebrew: $hebrew
+        notes: $notes
+        prayer_slug: $prayer_slug
+        translation: $translation
+        transliteration: $transliteration
+      }
+    ) {
+      affected_rows
+      returning {
+        id
+      }
+    }
+  }
+`
+
+const UPDATE_LINE_MUTATION = gql`
+  mutation UpdateLineMutation($id: Int = 10, $_set: prayer_lines_set_input = {}) {
+    update_prayer_lines(where: {id: {_eq: $id}}, _set: $_set) {
+      affected_rows
+    }
+  }
+`
+
+const REMOVE_LINE_MUTATION = gql`
+  mutation RemoveLineMutation($id: Int = 10) {
+    delete_prayer_lines(where: {id: {_eq: $id}}) {
+      affected_rows
+    }
+  }
+`
+export const useInsertLine = (bookSlug, sectionSlug, prayerSlug) => {
+  const [insertLine, {loading, error, data}] = useMutation(INSERT_LINE_MUTATION, {
+    ...contextIfTokenPresent(),
+    variables: {prayer_slug: prayerSlug},
+    refetchQueries: [
+      {query: GET_PRAYERS_PROSE_AND_LINES, variables: {bookSlug, sectionSlug, prayerSlug}},
+    ],
+  })
+  return {insertLine, loading, error, data}
+}
+
+export const useUpdateLine = (bookSlug, sectionSlug, prayerSlug) => {
+  const [updateLine, {loading, error, data}] = useMutation(UPDATE_LINE_MUTATION, {
+    ...contextIfTokenPresent(),
+    refetchQueries: [
+      {query: GET_PRAYERS_PROSE_AND_LINES, variables: {bookSlug, sectionSlug, prayerSlug}},
+    ],
+  })
+
+  return {updateLine, loading, error, data}
+}
+
+export const useRemoveLine = (id, prayerSlug, sectionSlug, bookSlug) => {
+  // console.log('useRemoveLine', {id, prayerSlug, sectionSlug, bookSlug})
+  const [removeLine, {loading, error, data}] = useMutation(REMOVE_LINE_MUTATION, {
+    ...contextIfTokenPresent(),
+    variables: {id},
+    refetchQueries: [
+      {query: GET_PRAYERS_PROSE_AND_LINES, variables: {prayerSlug, sectionSlug, bookSlug}},
+    ],
+  })
+
+  return {removeLine, loading, error, data}
+}
+
+export const INSERT_READING_MUTATION = gql`
+  mutation InsertReadingMutation(
+    $created_by: String = ""
+    $session_id: String = ""
+    $current_url: String = ""
+  ) {
+    insert_readings_one(
+      object: {session_id: $session_id, current_url: $current_url, created_by: $created_by}
+    ) {
+      id
+    }
+  }
+`
+export const useCreateReading = (userId) => {
+  const [createReading, {loading, error, data}] = useMutation(INSERT_READING_MUTATION, {
+    ...contextIfTokenPresent(),
+    variables: {created_by: userId},
+  })
+  return {createReading, loading, error, data}
+}
+
+export const FOLLOW_READING_SUBSCRIPTION = gql`
+  subscription FollowReadingSubscription($sessionId: String = "") {
+    readings(where: {session_id: {_eq: $sessionId}}) {
+      current_url
+      current_location_id
+      connected_readers_aggregate {
+        aggregate {
+          count
+        }
+      }
+    }
+  }
+`
+
+export const useFollowReading = (sessionId, opts = {}) => {
+  const [currentUrl, setCurrentUrl] = useState(null)
+  const [currentLocationId, setCurrentLocationId] = useState(null)
+  const [connectedCount, setConnectedCount] = useState(null)
+  const {data, loading, error} = useSubscription(FOLLOW_READING_SUBSCRIPTION, {
+    ...contextIfTokenPresent(),
+    variables: {sessionId},
+    ...opts,
+    onSubscriptionData: (...args) => {
+      console.log('onSubscriptionData', args)
+      const thisReading = args[0].subscriptionData.data.readings[0]
+
+      setCurrentUrl(thisReading ? thisReading.current_url : null)
+      setCurrentLocationId(thisReading ? thisReading.current_location_id : null)
+      setConnectedCount(thisReading ? thisReading.connected_readers_aggregate.aggregate.count : 0)
+      if (!opts.onSubscriptionData) return
+      return opts.onSubscriptionData(...args)
+    },
+    options: {
+      ...opts.options,
+      reconnect: !!sessionId,
+    },
+  })
+  console.log('useFollowReading', data)
+  return {
+    currentUrl,
+    currentLocationId,
+    connectedCount,
+    data,
+    loading,
+    error,
+  }
+}
+
+export const UPDATE_STARTED_SESSION_MUTATION = gql`
+  mutation UpdateStartedSessionMutation($sessionId: String = "", $_set: readings_set_input = {}) {
+    update_readings(where: {session_id: {_eq: $sessionId}}, _set: $_set) {
+      affected_rows
+    }
+  }
+`
+export const useUpdateStartedSession = () => {
+  const [updateStartedSession, {data, loading, error}] = useMutation(
+    UPDATE_STARTED_SESSION_MUTATION,
+    {
+      ...contextIfTokenPresent(),
+    }
+  )
+  return {updateStartedSession, data, loading, error}
+}
+export const REMOVE_STARTED_SESSION_MUTATION = gql`
+  mutation RemoveStartedSessionMutation($sessionId: String = "") {
+    delete_readings(where: {session_id: {_eq: $sessionId}}) {
+      affected_rows
+    }
+  }
+`
+export const useRemoveStartedSession = () => {
+  const [removeStartedSession, {data, loading, error}] = useMutation(
+    REMOVE_STARTED_SESSION_MUTATION,
+    {
+      ...contextIfTokenPresent(),
+    }
+  )
+  return {removeStartedSession, data, loading, error}
+}
+
+export const INSERT_CONNECTED_READER_MUTATION = gql`
+  mutation InsertConnectedReaderMutation(
+    $reader_id: String = ""
+    $session_id: String = ""
+    $user_id: String = null
+  ) {
+    insert_connected_readers(
+      objects: {reader_id: $reader_id, session_id: $session_id, user_id: $user_id}
+      on_conflict: {constraint: connected_readers_pkey, update_columns: [session_id, user_id]}
+    ) {
+      affected_rows
+    }
+  }
+`
+export const useInsertConnectedReader = () => {
+  const [insertConnectedReader, {data, loading, error}] = useMutation(
+    INSERT_CONNECTED_READER_MUTATION,
+    {
+      ...contextIfTokenPresent(),
+    }
+  )
+  return {insertConnectedReader, data, loading, error}
+}
+
+export const REMOVE_CONNECTED_READER_MUTATION = gql`
+  mutation RemoveConnectedReaderMutation($reader_id: String = "") {
+    delete_connected_readers(where: {reader_id: {_eq: $reader_id}}) {
+      affected_rows
+    }
+  }
+`
+export const useRemoveConnectedReader = () => {
+  const [removeConnectedReader, {data, loading, error}] = useMutation(
+    REMOVE_CONNECTED_READER_MUTATION,
+    {
+      ...contextIfTokenPresent(),
+    }
+  )
+  return {removeConnectedReader, data, loading, error}
+}
+
+export const GET_CONNECTED_READER_BY_ID_QUERY = gql`
+  query GetConnectedReaderByIdQuery($reader_id: String = "") {
+    connected_readers(where: {reader_id: {_eq: $reader_id}}) {
+      session_id
+    }
+  }
+`
+export const useLazyGetConnectedReaderById = (opts = {}) => {
+  const [getConnectedReaderById, {data, loading, error}] = useLazyQuery(
+    GET_CONNECTED_READER_BY_ID_QUERY,
+    {
+      ...contextIfTokenPresent(),
+      ...opts,
+    }
+  )
+  return {getConnectedReaderById, data, loading, error}
+}
+
+export const GET_SESSION_BY_USER_ID_QUERY = gql`
+  query GetSessionByUserIdQuery($user_id: String = "") {
+    readings(where: {created_by_user: {id: {_eq: $user_id}}}) {
+      session_id
+    }
+  }
+`
+export const useLazyGetSessionByUserId = (opts = {}) => {
+  const [getSessionByUserId, {data, loading, error}] = useLazyQuery(GET_SESSION_BY_USER_ID_QUERY, {
+    ...contextIfTokenPresent(),
+    ...opts,
+  })
+  return {getSessionByUserId, data, loading, error}
 }

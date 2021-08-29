@@ -1,14 +1,14 @@
-import {Box, Button, ButtonGroup} from '@chakra-ui/react'
-import {insert} from 'ramda'
 import React, {FC, useCallback, useRef} from 'react'
+
+import {insert} from 'ramda'
 import {MdAddCircle} from 'react-icons/md'
 import {useHoverDirty} from 'react-use'
+
+import {Box, Button, ButtonGroup} from '@chakra-ui/react'
+
 import {
-  GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY,
-  GET_PRAYERS_PROSE_AND_LINES,
-  useGetProseAndLines,
-  useInsertProse,
-  useUpdatePrayer,
+    GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY, GET_PRAYERS_PROSE_AND_LINES,
+    useGetProseAndLines, useInsertLine, useInsertProse, useUpdatePrayer
 } from '_/services/Api/queries'
 
 interface AddNewProseOrLineProps {
@@ -35,16 +35,26 @@ export const AddNewProseOrLine: FC<AddNewProseOrLineProps> = ({
   const isHovering = useHoverDirty(boxRef)
 
   const {insertProse} = useInsertProse(bookSlug, sectionSlug, prayerSlug)
+  const {insertLine} = useInsertLine(bookSlug, sectionSlug, prayerSlug)
   const {updatePrayer} = useUpdatePrayer(prayerId, bookSlug, sectionSlug)
   const {lineProseOrder} = useGetProseAndLines(bookSlug, sectionSlug, prayerSlug)
 
   const updatePrayerCb = useCallback(
     (data) => {
-      console.log({data})
-      console.log('insert', data.data.insert_prose.returning[0].id)
-      const id = data.data.insert_prose.returning[0].id
+      console.log('updatePrayerCb', {data})
+      let id
+      let type
 
-      const newOrder = insert(nextIndex, `prose-${id}`, lineProseOrder)
+      if (data.data.insert_prose) {
+        id = data.data.insert_prose.returning[0].id
+        type = 'prose'
+      } else {
+        id = data.data.insert_prayer_lines.returning[0].id
+        type = 'line'
+      }
+
+      const newOrder = insert(nextIndex, `${type}-${id}`, lineProseOrder)
+      console.log({newOrder})
       return updatePrayer({
         variables: {
           _set: {
@@ -71,17 +81,26 @@ export const AddNewProseOrLine: FC<AddNewProseOrLineProps> = ({
         console.error(e)
       })
   }, [insertProse, updatePrayerCb])
+
+  const insertLineCb = useCallback(() => {
+    insertLine()
+      .then(updatePrayerCb)
+      .catch((e) => {
+        console.error(e)
+      })
+  }, [insertLine, updatePrayerCb])
   return (
     <Box
       ref={boxRef}
       width="100%"
-      height="32px"
+      height="48px"
       position="relative"
       cursor="pointer"
       display="flex"
       flexDirection="row"
       alignItems="center"
       justifyContent="center"
+      marginTop="0 !important"
     >
       <Box
         width="100%"
@@ -107,7 +126,7 @@ export const AddNewProseOrLine: FC<AddNewProseOrLineProps> = ({
         <Button colorScheme="green" onClick={insertProseCb}>
           Add Prose
         </Button>
-        <Button colorScheme="green" ml="-px">
+        <Button colorScheme="green" ml="-px" onClick={insertLineCb}>
           Add Prayer Line
         </Button>
       </ButtonGroup>

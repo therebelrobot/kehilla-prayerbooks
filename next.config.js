@@ -3,6 +3,9 @@ require('dotenv').config()
 module.exports = {
   port: process.env.PORT,
   poweredByHeader: false,
+  typescript: {
+    ignoreBuildErrors: true,
+  },
   env: {
     HOSTNAME: process.env.HOSTNAME,
     PORT: process.env.PORT,

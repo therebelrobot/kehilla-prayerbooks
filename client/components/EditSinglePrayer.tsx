@@ -1,9 +1,14 @@
-import {Container, Heading as ChHeading, IconButton, List, Spacer} from '@chakra-ui/react'
-import NLink from 'next/link'
 import React, {FC} from 'react'
+
+import NLink from 'next/link'
 import {CgChevronLeftO} from 'react-icons/cg'
-import {MdCancel, MdNewReleases, MdPauseCircleFilled, MdSwapVerticalCircle} from 'react-icons/md'
+
+import {
+    Container, Heading as ChHeading, IconButton, List, Spacer
+} from '@chakra-ui/react'
+
 import {AddNewProseOrLine} from '_/components/AddNewProseOrLine'
+import {EditPrayerLine} from '_/components/EditPrayerLine'
 import {TipTapProse} from '_/components/TipTapProse'
 import {useGetProseAndLines} from '_/services/Api/queries'
 
@@ -12,20 +17,6 @@ interface EditSinglePrayerProps {
   sectionSlug: string
   prayerSlug: string
 }
-
-const statusIcons = {
-  UNSTARTED: MdCancel,
-  IN_PROGRESS: MdSwapVerticalCircle,
-  STALLED: MdPauseCircleFilled,
-  COMPLETE: MdNewReleases,
-}
-const statusColors = {
-  UNSTARTED: 'gray',
-  IN_PROGRESS: 'orange',
-  STALLED: 'red',
-  COMPLETE: 'green',
-}
-
 export const EditSinglePrayer: FC<EditSinglePrayerProps> = ({
   bookSlug,
   sectionSlug,
@@ -64,6 +55,7 @@ export const EditSinglePrayer: FC<EditSinglePrayerProps> = ({
           {ordered.map((item, index) => {
             console.log({item})
             if (item.type === 'prose') {
+              if (!item.tiptap_content) return null
               return (
                 <>
                   <TipTapProse
@@ -73,6 +65,28 @@ export const EditSinglePrayer: FC<EditSinglePrayerProps> = ({
                     prayerSlug={prayerSlug}
                     bookSlug={bookSlug}
                     sectionSlug={sectionSlug}
+                    index={Number(index)}
+                  />
+
+                  <AddNewProseOrLine
+                    prayerId={prayerId}
+                    prayerSlug={prayerSlug}
+                    bookSlug={bookSlug}
+                    sectionSlug={sectionSlug}
+                    nextIndex={Number(index) + 1}
+                  />
+                </>
+              )
+            } else if (item.type === 'line') {
+              return (
+                <>
+                  <EditPrayerLine
+                    key={`edit-prayer-line-${item.id}`}
+                    line={item}
+                    prayerSlug={prayerSlug}
+                    bookSlug={bookSlug}
+                    sectionSlug={sectionSlug}
+                    index={Number(index)}
                   />
 
                   <AddNewProseOrLine
