@@ -1,7 +1,14 @@
-import {Link as ChLink, List, ListIcon, ListItem} from '@chakra-ui/react'
-import Link from 'next/link'
 import React, {FC} from 'react'
-import {MdCancel, MdNewReleases, MdPauseCircleFilled, MdSwapVerticalCircle} from 'react-icons/md'
+
+import Link from 'next/link'
+import {
+    MdCancel, MdNewReleases, MdPauseCircleFilled, MdSwapVerticalCircle
+} from 'react-icons/md'
+
+import {
+    Box, Heading, Link as ChLink, List, ListIcon, ListItem
+} from '@chakra-ui/react'
+
 import {useListPrayerbooks} from '_/services/Api/queries'
 
 interface ListPrayerbooksProps {}
@@ -26,6 +33,9 @@ export const ListPrayerbooks: FC<ListPrayerbooksProps> = ({}) => {
   if (error) return <p>Error :( {JSON.stringify(error)}</p>
   return (
     <>
+      <Heading>Kehilla Prayerbooks</Heading>
+      <Heading size="sm">An unofficial digitized version.</Heading>
+      <Box width="100%" height="32px" borderBottomWidth="1px" marginBottom="32px" />
       <List spacing={3}>
         {books.map((book) => {
           return (

@@ -189,6 +189,7 @@ export const EditPrayerLine = ({line, bookSlug, sectionSlug, prayerSlug, index})
             >
               Undo changes
             </Button>
+            &nbsp; &nbsp; &nbsp;
             <Button mt={4} colorScheme="red" isLoading={props.isSubmitting} onClick={onOpen}>
               Delete
             </Button>

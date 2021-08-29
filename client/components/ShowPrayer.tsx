@@ -42,6 +42,7 @@ import {generateHTML} from '@tiptap/html'
 
 import {SessionUpdater} from '_/components/SessionUpdater'
 import {useGetProseAndLines} from '_/services/Api/queries'
+import {useFilters} from '_/services/state'
 
 interface ShowPrayerProps {
   bookSlug: string
@@ -68,7 +69,7 @@ export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSl
     sectionSlug,
     prayerSlug
   )
-
+  const {showHebrew, showTrans, showEng} = useFilters()
   if (loading) return <p>Loading...</p>
   if (error) return <p>Error :( {JSON.stringify(error)}</p>
   return (
@@ -86,7 +87,7 @@ export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSl
       </ChHeading>
       <Box height="32px" width="100%" flexShrink={0} />
 
-      <Container>
+      <Container maxW="container.lg" paddingX="50px">
         <List spacing={3}>
           {ordered.map((item, index) => {
             if (item.type === 'prose') {
@@ -124,13 +125,15 @@ export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSl
               console.log(content, typeof content)
               return (
                 <SessionUpdater id={item.id} type="prose">
-                  <Box
-                    key={`prose-${item.id}`}
-                    className="ProseMirror"
-                    dangerouslySetInnerHTML={{
-                      __html: content,
-                    }}
-                  />
+                  <Container>
+                    <Box
+                      key={`prose-${item.id}`}
+                      className="ProseMirror"
+                      dangerouslySetInnerHTML={{
+                        __html: content,
+                      }}
+                    />
+                  </Container>
                 </SessionUpdater>
               )
             } else if (item.type === 'line') {
@@ -144,19 +147,62 @@ export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSl
                       alignItems="center"
                       justifyContent="space-between"
                     >
-                      {!!item.hebrew.length && (
-                        <Box>
-                          <ChText className="hebrew">{item.hebrew}</ChText>
-                        </Box>
+                      {showHebrew && (
+                        <>
+                          <Box
+                            display="flex"
+                            flex={1}
+                            flexDirection="row"
+                            justifyContent="flex-end"
+                          >
+                            {!!item.hebrew.length ? (
+                              <ChText className="hebrew" display="block" dir="rtl">
+                                {item.hebrew}
+                              </ChText>
+                            ) : (
+                              <ChText fontSize="10px" as="i" opacity={0.55}>
+                                No Hebrew Available
+                              </ChText>
+                            )}
+                          </Box>
+                          <Box width="16px" flexShrink={0} />
+                        </>
                       )}
-                      {!!item.transliteration.length && (
-                        <Box>
-                          <ChText as="strong">{item.transliteration}</ChText>
-                        </Box>
+                      {showTrans && (
+                        <>
+                          <Box
+                            display="flex"
+                            flex={1}
+                            flexDirection="row"
+                            justifyContent={
+                              showHebrew ? 'flex-start' : showEng ? 'flex-end' : 'center'
+                            }
+                          >
+                            {!!item.transliteration.length ? (
+                              <ChText as="strong">{item.transliteration}</ChText>
+                            ) : (
+                              <ChText fontSize="10px" as="i" opacity={0.55}>
+                                No Transliteration Available
+                              </ChText>
+                            )}
+                          </Box>
+                          <Box width="16px" flexShrink={0} />
+                        </>
                       )}
-                      {!!item.translation.length && (
-                        <Box>
-                          <ChText>{item.translation}</ChText>
+                      {showEng && (
+                        <Box
+                          display="flex"
+                          flex={1}
+                          flexDirection="row"
+                          justifyContent={showHebrew || showTrans ? 'flex-start' : 'center'}
+                        >
+                          {!!item.translation.length ? (
+                            <ChText>{item.translation}</ChText>
+                          ) : (
+                            <ChText fontSize="10px" as="i" opacity={0.55}>
+                              No English Translation Available
+                            </ChText>
+                          )}
                         </Box>
                       )}
                     </Box>

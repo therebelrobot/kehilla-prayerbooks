@@ -22,6 +22,12 @@ export interface State {
   setMatchingSnippet: (snippet: State['matchingSnippet']) => void
   readerId: string | null
   setReaderId: (id: State['readerId']) => void
+  showHebrew: boolean
+  toggleShowHebrew: () => void
+  showTrans: boolean
+  toggleShowTrans: () => void
+  showEng: boolean
+  toggleShowEng: () => void
 }
 
 // defaults
@@ -79,6 +85,21 @@ const setReaderId = (id: State['readerId'], state: State) => {
   newState.readerId = id
   return newState
 }
+const toggleShowHebrew = (state: State) => {
+  const newState = {...state}
+  newState.showHebrew = !newState.showHebrew
+  return newState
+}
+const toggleShowTrans = (state: State) => {
+  const newState = {...state}
+  newState.showTrans = !newState.showTrans
+  return newState
+}
+const toggleShowEng = (state: State) => {
+  const newState = {...state}
+  newState.showEng = !newState.showEng
+  return newState
+}
 
 // selectors
 const getFriendName = (state: State) => state.friendName
@@ -114,6 +135,12 @@ export const useStore = create(
       set((state: State) => updateMatchingSnippet(snippet, state)),
     readerId: null,
     setReaderId: (id: State['readerId']) => set((state: State) => setReaderId(id, state)),
+    showHebrew: true,
+    showTrans: true,
+    showEng: true,
+    toggleShowHebrew: () => set((state: State) => toggleShowHebrew(state)),
+    toggleShowTrans: () => set((state: State) => toggleShowTrans(state)),
+    toggleShowEng: () => set((state: State) => toggleShowEng(state)),
   })
 )
 
@@ -157,4 +184,14 @@ export const useReadingSession = () =>
     setMatchingSnippet: state.setMatchingSnippet,
     readerId: state.readerId,
     setReaderId: state.setReaderId,
+  }))
+
+export const useFilters = () =>
+  useStore((state: State) => ({
+    showHebrew: state.showHebrew,
+    showTrans: state.showTrans,
+    showEng: state.showEng,
+    toggleShowHebrew: state.toggleShowHebrew,
+    toggleShowTrans: state.toggleShowTrans,
+    toggleShowEng: state.toggleShowEng,
   }))

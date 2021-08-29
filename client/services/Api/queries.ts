@@ -77,10 +77,12 @@ export const useGetSectionsByBookSlug = (bookSlug) => {
   })
 
   let sections = []
+  let status = 'UNSTARTED'
   if (data) {
     sections = data.prayerbooks[0].sections
+    status = data.prayerbooks[0].status
   }
-  return {...rest, data, sections}
+  return {...rest, data, sections, status}
 }
 
 export const GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY = gql`
