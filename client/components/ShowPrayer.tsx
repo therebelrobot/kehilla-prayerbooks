@@ -64,7 +64,7 @@ const statusColors = {
 }
 
 export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSlug}) => {
-  const {loading, error, data, prose, lines, ordered} = useGetProseAndLines(
+  const {loading, error, data, prayer, prose, lines, ordered} = useGetProseAndLines(
     bookSlug,
     sectionSlug,
     prayerSlug
@@ -72,6 +72,9 @@ export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSl
   const {showHebrew, showTrans, showEng} = useFilters()
   if (loading) return <p>Loading...</p>
   if (error) return <p>Error :( {JSON.stringify(error)}</p>
+
+  const singlePage = prayer.from_page === prayer.to_page
+
   return (
     <>
       <ChHeading size="md" display="flex" flexDirection="row" alignItems="center">
@@ -84,6 +87,11 @@ export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSl
         </NLink>
         <Spacer boxSize="8px" />
         {data.prayerbooks[0].sections[0].prayers[0].name}
+      </ChHeading>
+      <br />
+      <ChHeading size="xs" opacity={0.55}>
+        PDF page{singlePage ? '' : 's'} {prayer.from_page}
+        {singlePage ? '' : ` - ${prayer.to_page}`}
       </ChHeading>
       <Box height="32px" width="100%" flexShrink={0} />
 
@@ -177,6 +185,7 @@ export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSl
                             justifyContent={
                               showHebrew ? 'flex-start' : showEng ? 'flex-end' : 'center'
                             }
+                            textAlign={showHebrew ? 'left' : showEng ? 'right' : 'center'}
                           >
                             {!!item.transliteration.length ? (
                               <ChText as="strong">{item.transliteration}</ChText>

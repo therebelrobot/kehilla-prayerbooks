@@ -93,6 +93,7 @@ export const JoinedSessionBar = () => {
         flexDirection="row"
         justifyContent="center"
         alignItems="center"
+        flexGrow={1}
       >
         You are currently reading along with session {joinedSessionId}
       </Box>

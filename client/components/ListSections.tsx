@@ -2,9 +2,6 @@ import React, {FC} from 'react'
 
 import Link from 'next/link'
 import {CgChevronLeftO} from 'react-icons/cg'
-import {
-    MdCancel, MdNewReleases, MdPauseCircleFilled, MdSwapVerticalCircle
-} from 'react-icons/md'
 
 import {
     Box, Container, Heading, IconButton, Link as ChLink, List, ListItem, Spacer,
@@ -17,21 +14,9 @@ interface ListSectionsProps {
   bookSlug: string
 }
 
-const statusIcons = {
-  UNSTARTED: MdCancel,
-  IN_PROGRESS: MdSwapVerticalCircle,
-  STALLED: MdPauseCircleFilled,
-  COMPLETE: MdNewReleases,
-}
-const statusColors = {
-  UNSTARTED: 'gray',
-  IN_PROGRESS: 'orange',
-  STALLED: 'red',
-  COMPLETE: 'green',
-}
-
 export const ListSections: FC<ListSectionsProps> = ({bookSlug}) => {
-  const {loading, error, data, sections, status} = useGetSectionsByBookSlug(bookSlug)
+  const {loading, error, data, sections, orderedSections, status} =
+    useGetSectionsByBookSlug(bookSlug)
 
   if (loading) return <p>Loading...</p>
   if (error) return <p>Error :( {JSON.stringify(error)}</p>
@@ -79,12 +64,18 @@ export const ListSections: FC<ListSectionsProps> = ({bookSlug}) => {
         <hr />
       </Box>
       <List spacing={3}>
-        {sections.map((section) => {
+        {orderedSections.map((section) => {
+          const singlePage = section.toFromPages[0] === section.toFromPages[1]
           return (
             <ListItem display="flex" flexDirection="row" alignItems="center">
               <Link href={`/reading/${bookSlug}/${section.slug}`}>
                 <ChLink>{section.name}</ChLink>
               </Link>
+              <Box boxSize="16px" />
+              <Text fontSize="sm" opacity={0.55}>
+                PDF page{singlePage ? '' : 's'} {section.toFromPages[0]}
+                {singlePage ? '' : ` - ${section.toFromPages[1]}`}
+              </Text>
             </ListItem>
           )
         })}

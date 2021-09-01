@@ -1,36 +1,26 @@
-import {
-  Box,
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Link as ChLink,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-  Text,
-  useDisclosure,
-} from '@chakra-ui/react'
+import React from 'react'
+
 import {kebabCase} from 'case-anything'
 import {Field, Form, Formik, useFormikContext} from 'formik'
 import Link from 'next/link'
-import React from 'react'
 import {CgTrash} from 'react-icons/cg'
-import {MdModeEdit, MdOpenInBrowser} from 'react-icons/md'
+import {MdDragHandle, MdModeEdit, MdOpenInBrowser} from 'react-icons/md'
+
+import {
+    Box, Button, FormControl, FormErrorMessage, FormLabel, Input,
+    Link as ChLink, ListItem, Modal, ModalBody, ModalCloseButton, ModalContent,
+    ModalFooter, ModalHeader, ModalOverlay, Text, useDisclosure
+} from '@chakra-ui/react'
+
 import {useRemoveSection, useUpdateSection} from '_/services/Api/queries'
 
-export const EditOrDisplaySection = ({section, editingId, setEditingId, bookSlug}) => {
+export const EditOrDisplaySection = ({
+  section,
+  editingId,
+  setEditingId,
+  bookSlug,
+  dragHandleProps,
+}) => {
   const {updateSection} = useUpdateSection(section.id, bookSlug)
   const {isOpen, onOpen, onClose} = useDisclosure()
   const {removeSection} = useRemoveSection(section.id, bookSlug)
@@ -54,7 +44,6 @@ export const EditOrDisplaySection = ({section, editingId, setEditingId, bookSlug
           initialValues={{
             name: section.name,
             slug: section.slug,
-            pdfPage: section.pdf_page,
             _submit: null,
           }}
           onSubmit={(values, actions) => {
@@ -63,7 +52,6 @@ export const EditOrDisplaySection = ({section, editingId, setEditingId, bookSlug
                 _set: {
                   name: values.name,
                   slug: values.slug,
-                  pdf_page: values.pdfPage,
                   book_slug: bookSlug,
                 },
               },
@@ -111,21 +99,6 @@ export const EditOrDisplaySection = ({section, editingId, setEditingId, bookSlug
                   </FormControl>
                 )}
               </Field>
-              <Field name="pdfPage">
-                {({field, form}) => (
-                  <FormControl isInvalid={form.errors.pdfPage && form.touched.pdfPage}>
-                    <FormLabel htmlFor="pdfPage">PDF Page #</FormLabel>
-                    <NumberInput defaultValue={field.value}>
-                      <NumberInputField {...field} id="pdfPage" placeholder="pdfPage" />
-                      <NumberInputStepper>
-                        <NumberIncrementStepper />
-                        <NumberDecrementStepper />
-                      </NumberInputStepper>
-                    </NumberInput>
-                    <FormErrorMessage>{form.errors.pdfPage}</FormErrorMessage>
-                  </FormControl>
-                )}
-              </Field>
               <Field name="_submit">
                 {({field, form}) => (
                   <FormControl isInvalid={form.errors._submit}>
@@ -154,6 +127,10 @@ export const EditOrDisplaySection = ({section, editingId, setEditingId, bookSlug
   }
   return (
     <ListItem display="flex" flexDirection="row" alignItems="center">
+      <div {...dragHandleProps}>
+        <Box as={MdDragHandle} mr="16px" cursor="pointer" />
+      </div>
+
       <Text>{section.name}</Text>
       <Box boxSize="8px" />
       <ChLink _hover={{color: 'blue.500'}}>

@@ -4,7 +4,7 @@ import Link from 'next/link'
 import {CgChevronLeftO} from 'react-icons/cg'
 
 import {
-    Box, Heading, IconButton, Link as ChLink, List, ListItem, Spacer
+    Box, Heading, IconButton, Link as ChLink, List, ListItem, Spacer, Text
 } from '@chakra-ui/react'
 
 import {useGetPrayersBySectionAndBookSlug} from '_/services/Api/queries'
@@ -15,7 +15,10 @@ interface ListPrayersProps {
 }
 
 export const ListPrayers: FC<ListPrayersProps> = ({bookSlug, sectionSlug}) => {
-  const {loading, error, data, prayers} = useGetPrayersBySectionAndBookSlug(bookSlug, sectionSlug)
+  const {loading, error, data, orderedPrayers} = useGetPrayersBySectionAndBookSlug(
+    bookSlug,
+    sectionSlug
+  )
 
   if (loading) return <p>Loading...</p>
   if (error) return <p>Error :( {JSON.stringify(error)}</p>
@@ -41,12 +44,19 @@ export const ListPrayers: FC<ListPrayersProps> = ({bookSlug, sectionSlug}) => {
         <hr />
       </Box>
       <List spacing={3}>
-        {prayers.map((prayer) => {
+        {orderedPrayers.map((prayer) => {
+          const singlePage = prayer.from_page === prayer.to_page
+
           return (
             <ListItem display="flex" flexDirection="row" alignItems="center">
               <Link href={`/reading/${bookSlug}/${sectionSlug}/${prayer.slug}`}>
                 <ChLink>{prayer.name}</ChLink>
               </Link>
+              <Box boxSize="16px" />
+              <Text fontSize="sm" opacity={0.55}>
+                PDF page{singlePage ? '' : 's'} {prayer.from_page}
+                {singlePage ? '' : ` - ${prayer.to_page}`}
+              </Text>
             </ListItem>
           )
         })}

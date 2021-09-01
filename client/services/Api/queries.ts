@@ -49,7 +49,7 @@ export const useListPrayerbooks = () => {
   return {...rest, books}
 }
 
-const GET_SECTIONS_BY_BOOK_SLUG_QUERY = gql`
+export const GET_SECTIONS_BY_BOOK_SLUG_QUERY = gql`
   query GetSectionsByBookSlugQuery($bookSlug: String!) {
     prayerbooks(where: {slug: {_eq: $bookSlug}}) {
       name
@@ -57,13 +57,23 @@ const GET_SECTIONS_BY_BOOK_SLUG_QUERY = gql`
       pdf_link
       id
       slug
+      section_order
       sections {
         id
         is_supplemental
         name
-        pdf_page
         prayer_order
         slug
+        prayers_aggregate {
+          aggregate {
+            min {
+              from_page
+            }
+            max {
+              to_page
+            }
+          }
+        }
       }
     }
   }
@@ -78,11 +88,25 @@ export const useGetSectionsByBookSlug = (bookSlug) => {
 
   let sections = []
   let status = 'UNSTARTED'
+  let sectionOrder = []
+  let orderedSections = []
+  let bookId = null
+
   if (data) {
-    sections = data.prayerbooks[0].sections
+    sections = data.prayerbooks[0].sections.map((s) => ({
+      ...s,
+      toFromPages: [
+        s.prayers_aggregate.aggregate.min.from_page || 0,
+        s.prayers_aggregate.aggregate.max.to_page || 0,
+      ],
+    }))
     status = data.prayerbooks[0].status
+    sectionOrder = data.prayerbooks[0].section_order || []
+    orderedSections = sectionOrder.map((id) => sections.find((s) => s.id === id))
+    bookId = data.prayerbooks[0].id
+    console.log({sections, status, sectionOrder, orderedSections})
   }
-  return {...rest, data, sections, status}
+  return {...rest, data, sections, status, sectionOrder, orderedSections, bookId}
 }
 
 export const GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY = gql`
@@ -98,13 +122,14 @@ export const GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY = gql`
         slug
         is_supplemental
         name
-        pdf_page
         prayer_order
         prayers {
           id
           slug
           name
           line_prose_order
+          from_page
+          to_page
         }
       }
     }
@@ -119,10 +144,16 @@ export const useGetPrayersBySectionAndBookSlug = (bookSlug, sectionSlug) => {
   })
 
   let prayers = []
+  let prayerOrder = []
+  let orderedPrayers = []
+  let sectionId = null
   if (data) {
     prayers = data.prayerbooks[0].sections[0].prayers
+    prayerOrder = data.prayerbooks[0].sections[0].prayer_order
+    orderedPrayers = prayerOrder.map((id) => prayers.find((p) => p.id === id))
+    sectionId = data.prayerbooks[0].sections[0].id
   }
-  return {...rest, data, prayers}
+  return {...rest, data, prayers, prayerOrder, orderedPrayers, sectionId}
 }
 
 export const GET_PRAYERS_PROSE_AND_LINES = gql`
@@ -138,13 +169,14 @@ export const GET_PRAYERS_PROSE_AND_LINES = gql`
         slug
         is_supplemental
         name
-        pdf_page
         prayer_order
         prayers(where: {slug: {_eq: $prayerSlug}}) {
           id
           slug
           name
           line_prose_order
+          from_page
+          to_page
           prayer_lines {
             id
             hebrew
@@ -174,11 +206,13 @@ export const useGetProseAndLines = (bookSlug, sectionSlug, prayerSlug) => {
   let lines = []
   let order = []
   let prayerId = null
+  let prayer = null
   if (data) {
     prayerId = data.prayerbooks[0].sections[0].prayers[0].id
     prose = data.prayerbooks[0].sections[0].prayers[0].proses
     lines = data.prayerbooks[0].sections[0].prayers[0].prayer_lines
     order = data.prayerbooks[0].sections[0].prayers[0].line_prose_order || []
+    prayer = data.prayerbooks[0].sections[0].prayers[0]
   }
   // console.log({prose, lines, order})
   const ordered = order.map((typeId) => {
@@ -190,7 +224,7 @@ export const useGetProseAndLines = (bookSlug, sectionSlug, prayerSlug) => {
     }
     return {...lines.find((l) => l.id === Number(id)), type}
   })
-  return {...rest, data, prose, lines, ordered, lineProseOrder: order, prayerId}
+  return {...rest, data, prayer, prose, lines, ordered, lineProseOrder: order, prayerId}
 }
 
 const INSERT_BOOK_MUTATION = gql`

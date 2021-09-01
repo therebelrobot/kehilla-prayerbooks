@@ -1,20 +1,21 @@
-import {
-  Box,
-  Heading,
-  IconButton,
-  Link as ChLink,
-  List,
-  ListIcon,
-  ListItem,
-  Spacer,
-} from '@chakra-ui/react'
-import Link from 'next/link'
 import React, {FC, useState} from 'react'
+
+import Link from 'next/link'
+import {move} from 'ramda'
+import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd'
 import {CgChevronLeftO} from 'react-icons/cg'
 import {MdAddCircleOutline} from 'react-icons/md'
-import {CreatePrayer} from '_/components/CreatePrayer'
-import {useGetPrayersBySectionAndBookSlug} from '_/services/Api/queries'
 import {EditOrDisplayPrayer} from './EditOrDisplayPrayer'
+
+import {
+    Box, Heading, IconButton, Link as ChLink, List, ListIcon, ListItem, Spacer
+} from '@chakra-ui/react'
+
+import {CreatePrayer} from '_/components/CreatePrayer'
+import {
+    GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY,
+    useGetPrayersBySectionAndBookSlug, useUpdateSection
+} from '_/services/Api/queries'
 
 interface EditPrayersProps {
   bookSlug: string
@@ -22,9 +23,11 @@ interface EditPrayersProps {
 }
 
 export const EditPrayers: FC<EditPrayersProps> = ({bookSlug, sectionSlug}) => {
-  const {loading, error, prayers, data} = useGetPrayersBySectionAndBookSlug(bookSlug, sectionSlug)
+  const {loading, error, prayers, data, prayerOrder, orderedPrayers, sectionId} =
+    useGetPrayersBySectionAndBookSlug(bookSlug, sectionSlug)
   const [editingId, setEditingId] = React.useState<number>(null)
   const [showCreatePrayer, setShowCreatePrayer] = useState(false)
+  const {updateSection} = useUpdateSection(sectionId, bookSlug)
 
   if (loading) return <p>Loading...</p>
   if (error) return <p>Error :( {JSON.stringify(error)}</p>
@@ -49,36 +52,65 @@ export const EditPrayers: FC<EditPrayersProps> = ({bookSlug, sectionSlug}) => {
         {' '}
         <hr />
       </Box>
-      <List spacing={3}>
-        {prayers.map((prayer) => (
-          <EditOrDisplayPrayer
-            bookSlug={bookSlug}
-            sectionSlug={sectionSlug}
-            prayer={prayer}
-            editingId={editingId}
-            setEditingId={setEditingId}
-          />
-        ))}
+      <DragDropContext
+        onDragEnd={({source, destination}) => {
+          const newPrayerOrder = move(source.index, destination.index, prayerOrder)
+          console.log(prayerOrder, newPrayerOrder)
+          updateSection({
+            variables: {_set: {prayer_order: newPrayerOrder}},
+            refetchQueries: [
+              {
+                query: GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY,
+                variables: {bookSlug, sectionSlug},
+              },
+            ],
+          })
+        }}
+      >
+        <Droppable droppableId="droppable-prayer-list">
+          {(provided, snapshot) => (
+            <div {...provided.droppableProps} ref={provided.innerRef}>
+              <List spacing={3}>
+                {orderedPrayers.map((prayer, index) => (
+                  <Draggable key={String(prayer.id)} draggableId={String(prayer.id)} index={index}>
+                    {(provided, snapshot) => (
+                      <div ref={provided.innerRef} {...provided.draggableProps}>
+                        <EditOrDisplayPrayer
+                          dragHandleProps={provided.dragHandleProps}
+                          bookSlug={bookSlug}
+                          sectionSlug={sectionSlug}
+                          prayer={prayer}
+                          editingId={editingId}
+                          setEditingId={setEditingId}
+                        />
+                      </div>
+                    )}
+                  </Draggable>
+                ))}
 
-        {showCreatePrayer ? (
-          <>
-            <hr />
-            <CreatePrayer
-              bookSlug={bookSlug}
-              sectionSlug={sectionSlug}
-              setShowCreatePrayer={setShowCreatePrayer}
-            />
-          </>
-        ) : (
-          <>
-            <hr />
-            <ListItem display="flex" flexDirection="row" alignItems="center">
-              <ListIcon as={MdAddCircleOutline} color={`green.500`} />
-              <ChLink onClick={() => setShowCreatePrayer(true)}>Add a new prayer</ChLink>
-            </ListItem>
-          </>
-        )}
-      </List>
+                {showCreatePrayer ? (
+                  <>
+                    <hr />
+                    <CreatePrayer
+                      bookSlug={bookSlug}
+                      sectionSlug={sectionSlug}
+                      setShowCreatePrayer={setShowCreatePrayer}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <hr />
+                    <ListItem display="flex" flexDirection="row" alignItems="center">
+                      <ListIcon as={MdAddCircleOutline} color={`green.500`} />
+                      <ChLink onClick={() => setShowCreatePrayer(true)}>Add a new prayer</ChLink>
+                    </ListItem>
+                  </>
+                )}
+              </List>
+            </div>
+          )}
+        </Droppable>
+      </DragDropContext>
     </>
   )
 }

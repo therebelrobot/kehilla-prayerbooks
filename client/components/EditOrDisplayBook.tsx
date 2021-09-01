@@ -1,34 +1,21 @@
-import {
-  Box,
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Link as ChLink,
-  ListIcon,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Radio,
-  RadioGroup,
-  Text,
-  useDisclosure,
-} from '@chakra-ui/react'
+import React from 'react'
+
 import {kebabCase} from 'case-anything'
 import {Field, Form, Formik, useFormikContext} from 'formik'
 import isUrl from 'is-url'
 import Link from 'next/link'
-import React from 'react'
 import {CgTrash} from 'react-icons/cg'
 import {MdModeEdit, MdOpenInBrowser} from 'react-icons/md'
-import {useRemoveBook, useUpdateBook} from '_/services/Api/queries'
 import {statusColors, statusIcons} from './EditPrayerbooks'
+
+import {
+    Box, Button, FormControl, FormErrorMessage, FormLabel, Input,
+    Link as ChLink, ListIcon, ListItem, Modal, ModalBody, ModalCloseButton,
+    ModalContent, ModalFooter, ModalHeader, ModalOverlay, Radio, RadioGroup,
+    Text, useDisclosure
+} from '@chakra-ui/react'
+
+import {useRemoveBook, useUpdateBook} from '_/services/Api/queries'
 
 export const EditOrDisplayBook = ({book, editingId, setEditingId}) => {
   const {isOpen, onOpen, onClose} = useDisclosure()

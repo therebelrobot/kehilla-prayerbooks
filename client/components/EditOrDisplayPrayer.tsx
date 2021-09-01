@@ -1,31 +1,29 @@
-import {
-  Box,
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  Link as ChLink,
-  ListItem,
-  Modal,
-  ModalBody,
-  ModalCloseButton,
-  ModalContent,
-  ModalFooter,
-  ModalHeader,
-  ModalOverlay,
-  Text,
-  useDisclosure,
-} from '@chakra-ui/react'
+import React from 'react'
+
 import {kebabCase} from 'case-anything'
 import {Field, Form, Formik, useFormikContext} from 'formik'
 import Link from 'next/link'
-import React from 'react'
 import {CgTrash} from 'react-icons/cg'
-import {MdModeEdit, MdOpenInBrowser} from 'react-icons/md'
+import {MdDragHandle, MdModeEdit, MdOpenInBrowser} from 'react-icons/md'
+
+import {
+    Box, Button, FormControl, FormErrorMessage, FormLabel, Input,
+    Link as ChLink, ListItem, Modal, ModalBody, ModalCloseButton, ModalContent,
+    ModalFooter, ModalHeader, ModalOverlay, NumberDecrementStepper,
+    NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper,
+    Text, useDisclosure
+} from '@chakra-ui/react'
+
 import {useRemovePrayer, useUpdatePrayer} from '_/services/Api/queries'
 
-export const EditOrDisplayPrayer = ({prayer, editingId, setEditingId, bookSlug, sectionSlug}) => {
+export const EditOrDisplayPrayer = ({
+  dragHandleProps,
+  prayer,
+  editingId,
+  setEditingId,
+  bookSlug,
+  sectionSlug,
+}) => {
   const {updatePrayer} = useUpdatePrayer(prayer.id, bookSlug, sectionSlug)
   const {isOpen, onOpen, onClose} = useDisclosure()
   const {removePrayer} = useRemovePrayer(prayer.id, bookSlug, sectionSlug)
@@ -49,6 +47,8 @@ export const EditOrDisplayPrayer = ({prayer, editingId, setEditingId, bookSlug, 
           initialValues={{
             name: prayer.name,
             slug: prayer.slug,
+            from_page: prayer.from_page,
+            to_page: prayer.to_page,
             _submit: null,
           }}
           onSubmit={(values, actions) => {
@@ -57,6 +57,8 @@ export const EditOrDisplayPrayer = ({prayer, editingId, setEditingId, bookSlug, 
                 _set: {
                   name: values.name,
                   slug: values.slug,
+                  from_page: values.from_page,
+                  to_page: values.to_page,
                   section_slug: sectionSlug,
                 },
               },
@@ -104,6 +106,36 @@ export const EditOrDisplayPrayer = ({prayer, editingId, setEditingId, bookSlug, 
                   </FormControl>
                 )}
               </Field>
+              <Field name="from_page">
+                {({field, form}) => (
+                  <FormControl isInvalid={form.errors.from_page && form.touched.from_page}>
+                    <FormLabel htmlFor="from_page">Start Page #</FormLabel>
+                    <NumberInput defaultValue={field.value}>
+                      <NumberInputField {...field} id="from_page" placeholder="from_page" />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
+                    <FormErrorMessage>{form.errors.from_page}</FormErrorMessage>
+                  </FormControl>
+                )}
+              </Field>
+              <Field name="to_page">
+                {({field, form}) => (
+                  <FormControl isInvalid={form.errors.to_page && form.touched.to_page}>
+                    <FormLabel htmlFor="to_page">Start Page #</FormLabel>
+                    <NumberInput defaultValue={field.value}>
+                      <NumberInputField {...field} id="to_page" placeholder="to_page" />
+                      <NumberInputStepper>
+                        <NumberIncrementStepper />
+                        <NumberDecrementStepper />
+                      </NumberInputStepper>
+                    </NumberInput>
+                    <FormErrorMessage>{form.errors.to_page}</FormErrorMessage>
+                  </FormControl>
+                )}
+              </Field>
               <Field name="_submit">
                 {({field, form}) => (
                   <FormControl isInvalid={form.errors._submit}>
@@ -132,6 +164,9 @@ export const EditOrDisplayPrayer = ({prayer, editingId, setEditingId, bookSlug, 
   }
   return (
     <ListItem display="flex" flexDirection="row" alignItems="center">
+      <div {...dragHandleProps}>
+        <Box as={MdDragHandle} mr="16px" cursor="pointer" />
+      </div>
       <Text>{prayer.name}</Text>
       <Box boxSize="8px" />
       <ChLink _hover={{color: 'blue.500'}}>
