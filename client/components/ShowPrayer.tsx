@@ -2,9 +2,6 @@ import React, {FC} from 'react'
 
 import NLink from 'next/link'
 import {CgChevronLeftO} from 'react-icons/cg'
-import {
-    MdCancel, MdNewReleases, MdPauseCircleFilled, MdSwapVerticalCircle
-} from 'react-icons/md'
 
 import {
     Box, Container, Heading as ChHeading, IconButton, List, Spacer,
@@ -50,19 +47,6 @@ interface ShowPrayerProps {
   prayerSlug: string
 }
 
-const statusIcons = {
-  UNSTARTED: MdCancel,
-  IN_PROGRESS: MdSwapVerticalCircle,
-  STALLED: MdPauseCircleFilled,
-  COMPLETE: MdNewReleases,
-}
-const statusColors = {
-  UNSTARTED: 'gray',
-  IN_PROGRESS: 'orange',
-  STALLED: 'red',
-  COMPLETE: 'green',
-}
-
 export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSlug}) => {
   const {loading, error, data, prayer, prose, lines, ordered} = useGetProseAndLines(
     bookSlug,
@@ -85,7 +69,7 @@ export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSl
             aria-label={`return to ${data.prayerbooks[0].sections[0].name}`}
           />
         </NLink>
-        <Spacer boxSize="8px" />
+        <Spacer boxSize="8px" flexShrink={0} />
         {data.prayerbooks[0].sections[0].prayers[0].name}
       </ChHeading>
       <br />
@@ -95,7 +79,7 @@ export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSl
       </ChHeading>
       <Box height="32px" width="100%" flexShrink={0} />
 
-      <Container maxW="container.lg" paddingX="50px">
+      <Container maxW="100%">
         <List spacing={3}>
           {ordered.map((item, index) => {
             if (item.type === 'prose') {
@@ -147,17 +131,25 @@ export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSl
             } else if (item.type === 'line') {
               return (
                 <SessionUpdater id={item.id} type="line" width="100%">
-                  <Box width="100%" display="flex" flexDirection="column">
+                  <Box
+                    width="100%"
+                    display="flex"
+                    flexDirection="column"
+                    borderBottomWidth={{base: '1px', md: 0, lg: 0, xl: 0}}
+                  >
                     <Box
                       width="100%"
                       display="flex"
-                      flexDirection="row"
+                      flexDirection={{base: 'column', md: 'row', lg: 'row', xl: 'row'}}
                       alignItems="center"
                       justifyContent="space-between"
+                      flexWrap="wrap"
                     >
                       {showHebrew && (
                         <>
                           <Box
+                            mb={{base: '8px', md: 0, lg: 0, xl: 0}}
+                            w={{base: '100%', md: 'auto', lg: 'auto', xl: 'auto'}}
                             display="flex"
                             flex={1}
                             flexDirection="row"
@@ -179,6 +171,8 @@ export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSl
                       {showTrans && (
                         <>
                           <Box
+                            w={{base: '100%', md: 'auto', lg: 'auto', xl: 'auto'}}
+                            mb={{base: '8px', md: 0, lg: 0, xl: 0}}
                             display="flex"
                             flex={1}
                             flexDirection="row"
@@ -200,6 +194,8 @@ export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSl
                       )}
                       {showEng && (
                         <Box
+                          w={{base: '100%', md: 'auto', lg: 'auto', xl: 'auto'}}
+                          mb={{base: '8px', md: 0, lg: 0, xl: 0}}
                           display="flex"
                           flex={1}
                           flexDirection="row"

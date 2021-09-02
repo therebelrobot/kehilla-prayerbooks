@@ -41,7 +41,7 @@ export const AppLayout = ({children}) => {
           }
         `}
       />
-      <Box position="fixed" top={0} left={0} w="100vw" h="100vh" overflow="auto">
+      <Box position="fixed" top={0} left={0} w="100vw" h="100vh" overflow="auto" paddingX="64px">
         <NoSSR>
           <SettingsMenu />
           <FilterMenu />
