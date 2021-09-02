@@ -1,5 +1,7 @@
 import {useState} from 'react'
 
+import {eqProps, flatten, uniqWith} from 'ramda'
+
 import {
     gql, useLazyQuery, useMutation, useQuery, useSubscription
 } from '@apollo/client'
@@ -715,4 +717,70 @@ export const useLazyGetSessionByUserId = (opts = {}) => {
     ...opts,
   })
   return {getSessionByUserId, data, loading, error}
+}
+
+export const GET_ALL_PRAYERS_BY_PAGE_QUERY = gql`
+  query GetAllPrayersByPageQuery($bookSlug: String = "", $page: Int = 10) {
+    prayers(
+      where: {
+        section: {prayerbook: {slug: {_eq: $bookSlug}}}
+        from_page: {_lte: $page}
+        to_page: {_gte: $page}
+      }
+    ) {
+      id
+      name
+      slug
+      to_page
+      from_page
+      section {
+        prayer_order
+        id
+        name
+        slug
+        prayerbook {
+          section_order
+          name
+        }
+      }
+    }
+  }
+`
+export const useGetAllPrayersByPageQuery = (bookSlug, page) => {
+  const {data, ...rest} = useQuery(GET_ALL_PRAYERS_BY_PAGE_QUERY, {
+    ...contextIfTokenPresent(),
+    variables: {bookSlug, page},
+  })
+  let prayers = []
+  let orderedPrayers = []
+  if (bookSlug && page && data) {
+    prayers = data.prayers
+    if (prayers.length) {
+      const dupedSections = prayers.map((p) => p.section)
+      const idEq = eqProps('id')
+      const sections = uniqWith(idEq)(dupedSections)
+      const hasMoreThanOneSection = sections.length > 1
+      console.log({sections, dupedSections, prayers, bookSlug, page})
+      if (!hasMoreThanOneSection) {
+        const prayerOrder = prayers[0].section.prayer_order
+        orderedPrayers = prayerOrder.map((id) => prayers.find((p) => p.id === id)).filter(Boolean)
+      } else {
+        // these searches will NOT span prayerbooks, only sections
+        console.log(prayers[0])
+        const sectionOrder = prayers[0].section.prayerbook.section_order
+        orderedPrayers = flatten(
+          sectionOrder.map((sectionId) => {
+            const thisSection = sections.find((s) => (s.id = sectionId))
+            if (!thisSection) return null
+            const thisSectionOrderedPrayers = thisSection.prayer_order.map((id) =>
+              prayers.filter((p) => p.section.id === sectionId).find((p) => p.id === id)
+            )
+            return thisSectionOrderedPrayers
+          })
+        ).filter(Boolean)
+      }
+    }
+  }
+  console.log({prayers, orderedPrayers})
+  return {...rest, prayers, orderedPrayers}
 }

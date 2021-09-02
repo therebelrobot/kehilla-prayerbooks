@@ -1,57 +1,29 @@
 import React, {useRef} from 'react'
 
+import {useRouter} from 'next/router'
 import {useHoverDirty} from 'react-use'
+import {ExpandingMenuButton} from './ExpandingMenuButton'
 
-import {Box, Button, useColorMode, useColorModeValue} from '@chakra-ui/react'
+import {Box, useColorModeValue} from '@chakra-ui/react'
 import {RiEnglishInput, RiTranslate} from '@hacknug/react-icons/ri'
 
 import {useFilters} from '_/services/state'
 
 const bgColor = {light: 'white', dark: 'rgb(26, 32, 44)'}
 
-const ExpandingMenuButton = ({
-  colorScheme = 'gray',
-  isHovering,
-  onClick,
-  children,
-  width = '32px',
-  hoverWidth = '225px',
-}) => {
-  return (
-    <Box>
-      <Button
-        transition="width 0.3s ease, background-color 0.2s linear"
-        width={!isHovering ? width : hoverWidth}
-        overflow="hidden"
-        textAlign="left"
-        position="relative"
-        borderRadius={0}
-        onClick={onClick}
-        colorScheme={colorScheme}
-      >
-        <Box
-          display="flex"
-          flexDirection="row"
-          alignItems="center"
-          position="absolute"
-          left={0}
-          top="50%"
-          transform="translateY( -50% )"
-        >
-          {children}
-        </Box>
-      </Button>
-    </Box>
-  )
-}
-
 export const FilterMenu = () => {
   const boxRef = useRef(null)
   const isHovering = useHoverDirty(boxRef)
-  const {colorMode, toggleColorMode} = useColorMode()
   const bg = useColorModeValue('white', 'gray.800')
   const {showHebrew, showTrans, showEng, toggleShowHebrew, toggleShowTrans, toggleShowEng} =
     useFilters()
+
+  const router = useRouter()
+  const {query} = router
+  const {bookPath = []} = query
+  const [_, __, prayerSlug] = bookPath as string[]
+
+  if (!prayerSlug) return null
 
   return (
     <>

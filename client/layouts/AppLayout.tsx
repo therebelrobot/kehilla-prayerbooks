@@ -7,6 +7,7 @@ import {css, Global} from '@emotion/react'
 
 import {FilterMenu} from '_/components/FilterMenu'
 import {ReadingsMenu} from '_/components/ReadingsMenu'
+import {SearchMenu} from '_/components/SearchMenu'
 import {SettingsMenu} from '_/components/SettingsMenu'
 
 export const AppLayout = ({children}) => {
@@ -45,6 +46,7 @@ export const AppLayout = ({children}) => {
           <SettingsMenu />
           <FilterMenu />
           <ReadingsMenu />
+          <SearchMenu />
         </NoSSR>
         {children}
       </Box>
