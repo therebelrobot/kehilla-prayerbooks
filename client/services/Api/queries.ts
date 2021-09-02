@@ -746,21 +746,17 @@ export const GET_ALL_PRAYERS_BY_PAGE_QUERY = gql`
     }
   }
 `
-export const useGetAllPrayersByPageQuery = (bookSlug, page) => {
-  const {data, ...rest} = useQuery(GET_ALL_PRAYERS_BY_PAGE_QUERY, {
-    ...contextIfTokenPresent(),
-    variables: {bookSlug, page},
-  })
+const extractOrderedPrayers = (data, bookSlug, pageOrQuery) => {
   let prayers = []
   let orderedPrayers = []
-  if (bookSlug && page && data) {
+  if (bookSlug && pageOrQuery && data) {
     prayers = data.prayers
     if (prayers.length) {
       const dupedSections = prayers.map((p) => p.section)
       const idEq = eqProps('id')
       const sections = uniqWith(idEq)(dupedSections)
       const hasMoreThanOneSection = sections.length > 1
-      console.log({sections, dupedSections, prayers, bookSlug, page})
+      console.log({sections, dupedSections, prayers, bookSlug, pageOrQuery})
       if (!hasMoreThanOneSection) {
         const prayerOrder = prayers[0].section.prayer_order
         orderedPrayers = prayerOrder.map((id) => prayers.find((p) => p.id === id)).filter(Boolean)
@@ -770,7 +766,7 @@ export const useGetAllPrayersByPageQuery = (bookSlug, page) => {
         const sectionOrder = prayers[0].section.prayerbook.section_order
         orderedPrayers = flatten(
           sectionOrder.map((sectionId) => {
-            const thisSection = sections.find((s) => (s.id = sectionId))
+            const thisSection = sections.find((s) => s.id === sectionId)
             if (!thisSection) return null
             const thisSectionOrderedPrayers = thisSection.prayer_order.map((id) =>
               prayers.filter((p) => p.section.id === sectionId).find((p) => p.id === id)
@@ -781,6 +777,46 @@ export const useGetAllPrayersByPageQuery = (bookSlug, page) => {
       }
     }
   }
+  return {prayers, orderedPrayers}
+}
+
+export const useGetAllPrayersByPageQuery = (bookSlug, page) => {
+  const {data, ...rest} = useQuery(GET_ALL_PRAYERS_BY_PAGE_QUERY, {
+    ...contextIfTokenPresent(),
+    variables: {bookSlug, page},
+  })
+  const {prayers, orderedPrayers} = extractOrderedPrayers(data, bookSlug, page)
+  console.log({prayers, orderedPrayers})
+  return {...rest, prayers, orderedPrayers}
+}
+
+export const GET_ALL_PRAYERS_BY_SEARCH_QUERY = gql`
+  query GetAllPrayersBySearchQuery($bookSlug: String = "", $query: String = "") {
+    prayers(where: {section: {prayerbook: {slug: {_eq: $bookSlug}}}, name: {_ilike: $query}}) {
+      id
+      name
+      slug
+      to_page
+      from_page
+      section {
+        prayer_order
+        id
+        name
+        slug
+        prayerbook {
+          section_order
+          name
+        }
+      }
+    }
+  }
+`
+export const useGetAllPrayersBySearchQuery = (bookSlug, query) => {
+  const {data, ...rest} = useQuery(GET_ALL_PRAYERS_BY_SEARCH_QUERY, {
+    ...contextIfTokenPresent(),
+    variables: {bookSlug, query: query.length ? `%${query}%` : ''},
+  })
+  const {prayers, orderedPrayers} = extractOrderedPrayers(data, bookSlug, query)
   console.log({prayers, orderedPrayers})
   return {...rest, prayers, orderedPrayers}
 }
