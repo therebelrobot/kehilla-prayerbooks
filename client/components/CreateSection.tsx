@@ -1,19 +1,14 @@
-import {
-  Button,
-  FormControl,
-  FormErrorMessage,
-  FormLabel,
-  Input,
-  ListItem,
-  NumberDecrementStepper,
-  NumberIncrementStepper,
-  NumberInput,
-  NumberInputField,
-  NumberInputStepper,
-} from '@chakra-ui/react'
+import React from 'react'
+
 import {kebabCase} from 'case-anything'
 import {Field, Form, Formik, useFormikContext} from 'formik'
-import React from 'react'
+
+import {
+    Button, FormControl, FormErrorMessage, FormLabel, Input, ListItem,
+    NumberDecrementStepper, NumberIncrementStepper, NumberInput,
+    NumberInputField, NumberInputStepper
+} from '@chakra-ui/react'
+
 import {useInsertSection} from '_/services/Api/queries'
 
 export const CreateSection = ({setShowCreateSection, bookSlug}) => {
@@ -36,7 +31,6 @@ export const CreateSection = ({setShowCreateSection, bookSlug}) => {
         initialValues={{
           name: '',
           slug: '',
-          pdfPage: '',
           _submit: null,
         }}
         onSubmit={(values, actions) => {
@@ -45,7 +39,6 @@ export const CreateSection = ({setShowCreateSection, bookSlug}) => {
             variables: {
               name: values.name,
               slug: values.slug,
-              pdf_page: values.pdfPage,
               book_slug: bookSlug,
             },
           })
@@ -89,21 +82,6 @@ export const CreateSection = ({setShowCreateSection, bookSlug}) => {
                   <FormLabel htmlFor="slug">Url slug</FormLabel>
                   <Input {...field} id="slug" placeholder="slug" />
                   <FormErrorMessage>{form.errors.slug}</FormErrorMessage>
-                </FormControl>
-              )}
-            </Field>
-            <Field name="pdfPage">
-              {({field, form}) => (
-                <FormControl isInvalid={form.errors.pdfPage && form.touched.pdfPage}>
-                  <FormLabel htmlFor="pdfPage">PDF Page #</FormLabel>
-                  <NumberInput defaultValue={field.value}>
-                    <NumberInputField {...field} id="pdfPage" placeholder="pdfPage" />
-                    <NumberInputStepper>
-                      <NumberIncrementStepper />
-                      <NumberDecrementStepper />
-                    </NumberInputStepper>
-                  </NumberInput>
-                  <FormErrorMessage>{form.errors.pdfPage}</FormErrorMessage>
                 </FormControl>
               )}
             </Field>
