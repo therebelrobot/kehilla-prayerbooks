@@ -1,11 +1,21 @@
-import {Button, FormControl, FormErrorMessage, FormLabel, Input, ListItem} from '@chakra-ui/react'
+import React from 'react'
+
 import {kebabCase} from 'case-anything'
 import {Field, Form, Formik, useFormikContext} from 'formik'
-import React from 'react'
-import {useInsertPrayer} from '_/services/Api/queries'
 
-export const CreatePrayer = ({setShowCreatePrayer, bookSlug, sectionSlug}) => {
+import {
+    Button, FormControl, FormErrorMessage, FormLabel, Input, ListItem
+} from '@chakra-ui/react'
+
+import {
+    GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY, useInsertPrayer,
+    useUpdateSectionBySlug
+} from '_/services/Api/queries'
+
+export const CreatePrayer = ({setShowCreatePrayer, bookSlug, sectionSlug, prayerOrder}) => {
   const {insertPrayer} = useInsertPrayer(bookSlug, sectionSlug)
+  const {updateSection} = useUpdateSectionBySlug(sectionSlug, bookSlug)
+
   const formikContext = useFormikContext()
   console.log({formikContext})
   const validateSlug = (value) => {
@@ -34,9 +44,22 @@ export const CreatePrayer = ({setShowCreatePrayer, bookSlug, sectionSlug}) => {
               section_slug: sectionSlug,
             },
           })
-            .then(() => {
+            .then((results) => {
               actions.setFieldError('_submit', null)
               setShowCreatePrayer(false)
+              return updateSection({
+                variables: {
+                  _set: {
+                    prayer_order: [...prayerOrder, results.data.insert_prayers.returning[0].id],
+                  },
+                },
+                refetchQueries: [
+                  {
+                    query: GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY,
+                    variables: {bookSlug, sectionSlug},
+                  },
+                ],
+              })
             })
             .catch((err) => {
               console.error(err)

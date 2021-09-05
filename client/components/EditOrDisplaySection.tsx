@@ -12,7 +12,10 @@ import {
     ModalFooter, ModalHeader, ModalOverlay, Text, useDisclosure
 } from '@chakra-ui/react'
 
-import {useRemoveSection, useUpdateSection} from '_/services/Api/queries'
+import {
+    GET_SECTIONS_BY_BOOK_SLUG_QUERY, useRemoveSection, useUpdateBookBySlug,
+    useUpdateSection
+} from '_/services/Api/queries'
 
 export const EditOrDisplaySection = ({
   section,
@@ -20,10 +23,12 @@ export const EditOrDisplaySection = ({
   setEditingId,
   bookSlug,
   dragHandleProps,
+  sectionOrder,
 }) => {
   const {updateSection} = useUpdateSection(section.id, bookSlug)
   const {isOpen, onOpen, onClose} = useDisclosure()
   const {removeSection} = useRemoveSection(section.id, bookSlug)
+  const {updateBook} = useUpdateBookBySlug(bookSlug)
 
   const formikContext = useFormikContext()
   console.log({formikContext})
@@ -169,7 +174,18 @@ export const EditOrDisplaySection = ({
               <Button
                 colorScheme="red"
                 onClick={() => {
-                  removeSection().then(onClose)
+                  removeSection()
+                    .then(() => {
+                      const newSectionOrder = sectionOrder.filter((s) => s.id !== section.id)
+                      console.log(sectionOrder, newSectionOrder)
+                      updateBook({
+                        variables: {_set: {section_order: newSectionOrder}},
+                        refetchQueries: [
+                          {query: GET_SECTIONS_BY_BOOK_SLUG_QUERY, variables: {bookSlug}},
+                        ],
+                      })
+                    })
+                    .then(onClose)
                 }}
               >
                 Yes, I want this gone forever.

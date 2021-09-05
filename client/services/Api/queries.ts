@@ -3,8 +3,9 @@ import {useState} from 'react'
 import {eqProps, flatten, uniqWith} from 'ramda'
 
 import {
-    gql, useLazyQuery, useMutation, useQuery, useSubscription
+    gql, useLazyQuery, useMutation, useQuery as useQueryRaw, useSubscription
 } from '@apollo/client'
+import {useAuth0} from '@auth0/auth0-react'
 
 import {localStorage} from '_/utils/localStorage'
 
@@ -38,6 +39,23 @@ const LIST_PRAYERBOOKS_QUERY = gql`
     }
   }
 `
+const useQuery = (query, ...rest) => {
+  const {logout} = useAuth0()
+  const results = useQueryRaw(query, ...rest)
+  if (
+    results.error &&
+    results.error?.graphQLErrors &&
+    results.error.graphQLErrors[0] &&
+    results.error.graphQLErrors[0].message &&
+    results.error.graphQLErrors[0].message.includes('JWTExpired')
+  ) {
+    console.error('JWTExpired')
+    localStorage().removeItem('auth_token')
+    logout({returnTo: window.location.origin})
+  }
+  return results
+}
+
 export const useListPrayerbooks = () => {
   const {data, ...rest} = useQuery(LIST_PRAYERBOOKS_QUERY, contextIfTokenPresent())
   let books = data
@@ -104,7 +122,7 @@ export const useGetSectionsByBookSlug = (bookSlug) => {
     }))
     status = data.prayerbooks[0].status
     sectionOrder = data.prayerbooks[0].section_order || []
-    orderedSections = sectionOrder.map((id) => sections.find((s) => s.id === id))
+    orderedSections = sectionOrder.map((id) => sections.find((s) => s.id === id)).filter(Boolean)
     bookId = data.prayerbooks[0].id
     console.log({sections, status, sectionOrder, orderedSections})
   }
@@ -152,7 +170,7 @@ export const useGetPrayersBySectionAndBookSlug = (bookSlug, sectionSlug) => {
   if (data) {
     prayers = data.prayerbooks[0].sections[0].prayers
     prayerOrder = data.prayerbooks[0].sections[0].prayer_order
-    orderedPrayers = prayerOrder.map((id) => prayers.find((p) => p.id === id))
+    orderedPrayers = prayerOrder.map((id) => prayers.find((p) => p.id === id)).filter(Boolean)
     sectionId = data.prayerbooks[0].sections[0].id
   }
   return {...rest, data, prayers, prayerOrder, orderedPrayers, sectionId}
@@ -253,6 +271,13 @@ const UPDATE_BOOK_MUTATION = gql`
     }
   }
 `
+const UPDATE_BOOK_MUTATION_BY_SLUG = gql`
+  mutation UpdateBookMutation($_set: prayerbooks_set_input = {}, $bookSlug: String = "") {
+    update_prayerbooks(where: {slug: {_eq: $bookSlug}}, _set: $_set) {
+      affected_rows
+    }
+  }
+`
 const REMOVE_BOOK_MUTATION = gql`
   mutation RemoveBookMutation($bookId: Int = 0) {
     delete_prayerbooks(where: {id: {_eq: $bookId}}) {
@@ -264,6 +289,16 @@ export const useUpdateBook = (bookId) => {
   const [updateBook, {loading, error, data}] = useMutation(UPDATE_BOOK_MUTATION, {
     ...contextIfTokenPresent(),
     variables: {bookId},
+    refetchQueries: [{query: LIST_PRAYERBOOKS_QUERY}],
+  })
+
+  return {updateBook, loading, error, data}
+}
+
+export const useUpdateBookBySlug = (bookSlug) => {
+  const [updateBook, {loading, error, data}] = useMutation(UPDATE_BOOK_MUTATION_BY_SLUG, {
+    ...contextIfTokenPresent(),
+    variables: {bookSlug},
     refetchQueries: [{query: LIST_PRAYERBOOKS_QUERY}],
   })
 
@@ -287,15 +322,8 @@ export const useRemoveBook = (bookId) => {
 }
 
 const INSERT_SECTION_MUTATION = gql`
-  mutation InsertBookMutation(
-    $name: String = ""
-    $pdf_page: Int = 0
-    $slug: String = ""
-    $book_slug: String = ""
-  ) {
-    insert_sections(
-      objects: [{name: $name, pdf_page: $pdf_page, slug: $slug, book_slug: $book_slug}]
-    ) {
+  mutation InsertBookMutation($name: String = "", $slug: String = "", $book_slug: String = "") {
+    insert_sections(objects: [{name: $name, slug: $slug, book_slug: $book_slug}]) {
       affected_rows
       returning {
         id
@@ -306,6 +334,20 @@ const INSERT_SECTION_MUTATION = gql`
 const UPDATE_SECTION_MUTATION = gql`
   mutation UpdateSectionMutation($_set: sections_set_input = {}, $sectionId: Int = 10) {
     update_sections(where: {id: {_eq: $sectionId}}, _set: $_set) {
+      affected_rows
+    }
+  }
+`
+const UPDATE_SECTION_BY_SLUG_MUTATION = gql`
+  mutation UpdateSectionBySlugMutation(
+    $_set: sections_set_input = {}
+    $sectionSlug: String = ""
+    $bookSlug: String = ""
+  ) {
+    update_sections(
+      where: {_and: {slug: {_eq: $sectionSlug}, prayerbook: {slug: {_eq: $bookSlug}}}}
+      _set: $_set
+    ) {
       affected_rows
     }
   }
@@ -321,6 +363,15 @@ export const useUpdateSection = (sectionId, bookSlug) => {
   const [updateSection, {loading, error, data}] = useMutation(UPDATE_SECTION_MUTATION, {
     ...contextIfTokenPresent(),
     variables: {sectionId},
+    refetchQueries: [{query: GET_SECTIONS_BY_BOOK_SLUG_QUERY, variables: {bookSlug}}],
+  })
+
+  return {updateSection, loading, error, data}
+}
+export const useUpdateSectionBySlug = (sectionSlug, bookSlug) => {
+  const [updateSection, {loading, error, data}] = useMutation(UPDATE_SECTION_BY_SLUG_MUTATION, {
+    ...contextIfTokenPresent(),
+    variables: {sectionSlug, bookSlug},
     refetchQueries: [{query: GET_SECTIONS_BY_BOOK_SLUG_QUERY, variables: {bookSlug}}],
   })
 

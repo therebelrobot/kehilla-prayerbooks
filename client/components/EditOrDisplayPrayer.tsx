@@ -14,7 +14,10 @@ import {
     Text, useDisclosure
 } from '@chakra-ui/react'
 
-import {useRemovePrayer, useUpdatePrayer} from '_/services/Api/queries'
+import {
+    GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY, useRemovePrayer,
+    useUpdatePrayer, useUpdateSectionBySlug
+} from '_/services/Api/queries'
 
 export const EditOrDisplayPrayer = ({
   dragHandleProps,
@@ -23,10 +26,12 @@ export const EditOrDisplayPrayer = ({
   setEditingId,
   bookSlug,
   sectionSlug,
+  prayerOrder,
 }) => {
   const {updatePrayer} = useUpdatePrayer(prayer.id, bookSlug, sectionSlug)
   const {isOpen, onOpen, onClose} = useDisclosure()
   const {removePrayer} = useRemovePrayer(prayer.id, bookSlug, sectionSlug)
+  const {updateSection} = useUpdateSectionBySlug(sectionSlug, bookSlug)
 
   const formikContext = useFormikContext()
   console.log({formikContext})
@@ -205,7 +210,25 @@ export const EditOrDisplayPrayer = ({
               <Button
                 colorScheme="red"
                 onClick={() => {
-                  removePrayer().then(onClose)
+                  removePrayer()
+                    .then(() => {
+                      const newPrayerOrder = prayerOrder.filter((p) => p.id !== prayer.id)
+                      console.log({prayerOrder, newPrayerOrder})
+                      return updateSection({
+                        variables: {
+                          _set: {
+                            prayer_order: newPrayerOrder,
+                          },
+                        },
+                        refetchQueries: [
+                          {
+                            query: GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY,
+                            variables: {bookSlug, sectionSlug},
+                          },
+                        ],
+                      })
+                    })
+                    .then(onClose)
                 }}
               >
                 Yes, I want this gone forever.

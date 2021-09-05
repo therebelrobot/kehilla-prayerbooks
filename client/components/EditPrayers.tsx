@@ -29,6 +29,8 @@ export const EditPrayers: FC<EditPrayersProps> = ({bookSlug, sectionSlug}) => {
   const [showCreatePrayer, setShowCreatePrayer] = useState(false)
   const {updateSection} = useUpdateSection(sectionId, bookSlug)
 
+  console.log({prayers, prayerOrder, orderedPrayers})
+
   if (loading) return <p>Loading...</p>
   if (error) return <p>Error :( {JSON.stringify(error)}</p>
   return (
@@ -82,6 +84,7 @@ export const EditPrayers: FC<EditPrayersProps> = ({bookSlug, sectionSlug}) => {
                           prayer={prayer}
                           editingId={editingId}
                           setEditingId={setEditingId}
+                          prayerOrder={prayerOrder}
                         />
                       </div>
                     )}
@@ -95,6 +98,7 @@ export const EditPrayers: FC<EditPrayersProps> = ({bookSlug, sectionSlug}) => {
                       bookSlug={bookSlug}
                       sectionSlug={sectionSlug}
                       setShowCreatePrayer={setShowCreatePrayer}
+                      prayerOrder={prayerOrder}
                     />
                   </>
                 ) : (

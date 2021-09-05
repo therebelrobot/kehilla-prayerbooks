@@ -4,10 +4,7 @@ import Link from 'next/link'
 import {move} from 'ramda'
 import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd'
 import {CgChevronLeftO} from 'react-icons/cg'
-import {
-    MdAddCircleOutline, MdCancel, MdNewReleases, MdPauseCircleFilled,
-    MdSwapVerticalCircle
-} from 'react-icons/md'
+import {MdAddCircleOutline} from 'react-icons/md'
 import {EditOrDisplaySection} from './EditOrDisplaySection'
 
 import {
@@ -21,19 +18,6 @@ import {
 
 interface EditSectionsProps {
   bookSlug: string
-}
-
-const statusIcons = {
-  UNSTARTED: MdCancel,
-  IN_PROGRESS: MdSwapVerticalCircle,
-  STALLED: MdPauseCircleFilled,
-  COMPLETE: MdNewReleases,
-}
-const statusColors = {
-  UNSTARTED: 'gray',
-  IN_PROGRESS: 'orange',
-  STALLED: 'red',
-  COMPLETE: 'green',
 }
 
 export const EditSections: FC<EditSectionsProps> = ({bookSlug}) => {
@@ -90,6 +74,7 @@ export const EditSections: FC<EditSectionsProps> = ({bookSlug}) => {
                           section={section}
                           editingId={editingId}
                           setEditingId={setEditingId}
+                          sectionOrder={sectionOrder}
                         />
                       </div>
                     )}
@@ -102,6 +87,7 @@ export const EditSections: FC<EditSectionsProps> = ({bookSlug}) => {
                     <CreateSection
                       bookSlug={bookSlug}
                       setShowCreateSection={setShowCreateSection}
+                      sectionOrder={sectionOrder}
                     />
                   </>
                 ) : (

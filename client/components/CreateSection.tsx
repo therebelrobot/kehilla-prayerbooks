@@ -4,15 +4,16 @@ import {kebabCase} from 'case-anything'
 import {Field, Form, Formik, useFormikContext} from 'formik'
 
 import {
-    Button, FormControl, FormErrorMessage, FormLabel, Input, ListItem,
-    NumberDecrementStepper, NumberIncrementStepper, NumberInput,
-    NumberInputField, NumberInputStepper
+    Button, FormControl, FormErrorMessage, FormLabel, Input, ListItem
 } from '@chakra-ui/react'
 
-import {useInsertSection} from '_/services/Api/queries'
+import {
+    GET_SECTIONS_BY_BOOK_SLUG_QUERY, useInsertSection, useUpdateBookBySlug
+} from '_/services/Api/queries'
 
-export const CreateSection = ({setShowCreateSection, bookSlug}) => {
+export const CreateSection = ({setShowCreateSection, bookSlug, sectionOrder}) => {
   const {insertSection} = useInsertSection(bookSlug)
+  const {updateBook} = useUpdateBookBySlug(bookSlug)
   const formikContext = useFormikContext()
   console.log({bookSlug})
   const validateSlug = (value) => {
@@ -42,9 +43,18 @@ export const CreateSection = ({setShowCreateSection, bookSlug}) => {
               book_slug: bookSlug,
             },
           })
-            .then(() => {
+            .then((results) => {
+              console.log({results})
               actions.setFieldError('_submit', null)
               setShowCreateSection(null)
+              return updateBook({
+                variables: {
+                  _set: {
+                    section_order: [...sectionOrder, results.data.insert_sections.returning[0].id],
+                  },
+                },
+                refetchQueries: [{query: GET_SECTIONS_BY_BOOK_SLUG_QUERY, variables: {bookSlug}}],
+              })
             })
             .catch((err) => {
               console.error(err)
