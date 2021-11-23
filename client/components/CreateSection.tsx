@@ -1,15 +1,10 @@
-import React from 'react'
-
+import {Button, FormControl, FormErrorMessage, FormLabel, Input, ListItem} from '@chakra-ui/react'
 import {kebabCase} from 'case-anything'
 import {Field, Form, Formik, useFormikContext} from 'formik'
-
-import {
-    Button, FormControl, FormErrorMessage, FormLabel, Input, ListItem
-} from '@chakra-ui/react'
-
-import {
-    GET_SECTIONS_BY_BOOK_SLUG_QUERY, useInsertSection, useUpdateBookBySlug
-} from '_/services/Api/queries'
+import React from 'react'
+import {useUpdateBookBySlug} from '_/services/Api/queries/prayerbooks/useUpdateBookBySlug'
+import {GET_SECTIONS_BY_BOOK_SLUG_QUERY} from '_/services/Api/queries/sections/GET_SECTIONS_BY_BOOK_SLUG_QUERY'
+import {useInsertSection} from '_/services/Api/queries/sections/useInsertSection'
 
 export const CreateSection = ({setShowCreateSection, bookSlug, sectionOrder}) => {
   const {insertSection} = useInsertSection(bookSlug)

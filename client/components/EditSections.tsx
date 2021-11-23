@@ -1,20 +1,24 @@
-import React, {FC, useState} from 'react'
-
+import {
+  Box,
+  Heading,
+  IconButton,
+  Link as ChLink,
+  List,
+  ListIcon,
+  ListItem,
+  Spacer,
+} from '@chakra-ui/react'
 import Link from 'next/link'
 import {move} from 'ramda'
+import React, {FC, useState} from 'react'
 import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd'
 import {CgChevronLeftO} from 'react-icons/cg'
 import {MdAddCircleOutline} from 'react-icons/md'
-import {EditOrDisplaySection} from './EditOrDisplaySection'
-
-import {
-    Box, Heading, IconButton, Link as ChLink, List, ListIcon, ListItem, Spacer
-} from '@chakra-ui/react'
-
 import {CreateSection} from '_/components/CreateSection'
-import {
-    GET_SECTIONS_BY_BOOK_SLUG_QUERY, useGetSectionsByBookSlug, useUpdateBook
-} from '_/services/Api/queries'
+import {useUpdateBook} from '_/services/Api/queries/prayerbooks/useUpdateBook'
+import {GET_SECTIONS_BY_BOOK_SLUG_QUERY} from '_/services/Api/queries/sections/GET_SECTIONS_BY_BOOK_SLUG_QUERY'
+import {useGetSectionsByBookSlug} from '_/services/Api/queries/sections/useGetSectionsByBookSlug'
+import {EditOrDisplaySection} from './EditOrDisplaySection'
 
 interface EditSectionsProps {
   bookSlug: string

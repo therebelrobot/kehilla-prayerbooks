@@ -1,23 +1,32 @@
-import React, {useCallback} from 'react'
-
-import {remove} from 'ramda'
-import {CgTrash} from 'react-icons/cg'
-import {throttle} from 'throttle-debounce'
-import {TipTapMenuBar} from './TipTapMenuBar'
-
 import {
-    Box, Button, IconButton, Modal, ModalBody, ModalCloseButton, ModalContent,
-    ModalFooter, ModalHeader, ModalOverlay, Text, useDisclosure
+  Box,
+  Button,
+  IconButton,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Text,
+  useDisclosure,
 } from '@chakra-ui/react'
 import {EditorContent, useEditor} from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
-
-import {
-    GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY, GET_PRAYERS_PROSE_AND_LINES,
-    useGetProseAndLines, useInsertProse, useRemoveProse, useUpdatePrayer,
-    useUpdateProse
-} from '_/services/Api/queries'
+import {remove} from 'ramda'
+import React, {useCallback} from 'react'
+import {CgTrash} from 'react-icons/cg'
+import {throttle} from 'throttle-debounce'
+import {GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY} from '_/services/Api/queries/prayers/GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY'
+import {useUpdatePrayer} from '_/services/Api/queries/prayers/useUpdatePrayer'
+import {GET_PRAYERS_PROSE_AND_LINES} from '_/services/Api/queries/proseAndLines/GET_PRAYERS_PROSE_AND_LINES'
+import {useGetProseAndLines} from '_/services/Api/queries/proseAndLines/useGetProseAndLines'
+import {useInsertProse} from '_/services/Api/queries/proseAndLines/useInsertProse'
+import {useRemoveProse} from '_/services/Api/queries/proseAndLines/useRemoveProse'
+import {useUpdateProse} from '_/services/Api/queries/proseAndLines/useUpdateProse'
 import {useEditing, useStore} from '_/services/state'
+import {TipTapMenuBar} from './TipTapMenuBar'
 
 export const TipTapProse = ({content, prayerId, id, bookSlug, sectionSlug, prayerSlug, index}) => {
   const {activeEditId, setActiveEditId} = useEditing()

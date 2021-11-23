@@ -1,11 +1,11 @@
-import React, {FC} from 'react'
-
-import NLink from 'next/link'
-import {CgChevronLeftO} from 'react-icons/cg'
-
 import {
-    Box, Container, Heading as ChHeading, IconButton, List, Spacer,
-    Text as ChText
+  Box,
+  Button,
+  Container,
+  Heading as ChHeading,
+  List,
+  Spacer,
+  Text as ChText,
 } from '@chakra-ui/react'
 import Blockquote from '@tiptap/extension-blockquote'
 import Bold from '@tiptap/extension-bold'
@@ -36,9 +36,12 @@ import TextAlign from '@tiptap/extension-text-align'
 import TextStyle from '@tiptap/extension-text-style'
 import Underline from '@tiptap/extension-underline'
 import {generateHTML} from '@tiptap/html'
-
+import NLink from 'next/link'
+import React, {FC} from 'react'
+import {CgChevronLeftO} from 'react-icons/cg'
+import {NavigationButtons} from '_/components/NavigationButtons'
 import {SessionUpdater} from '_/components/SessionUpdater'
-import {useGetProseAndLines} from '_/services/Api/queries'
+import {useGetProseAndLines} from '_/services/Api/queries/proseAndLines/useGetProseAndLines'
 import {useFilters} from '_/services/state'
 
 interface ShowPrayerProps {
@@ -61,23 +64,21 @@ export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSl
 
   return (
     <>
+      <NLink href={`/reading/${bookSlug}/${sectionSlug}`}>
+        <Button size="xs" leftIcon={<CgChevronLeftO />} variant="solid" mb={8}>
+          Back to {'Section Name'}
+        </Button>
+      </NLink>
       <ChHeading size="md" display="flex" flexDirection="row" alignItems="center">
-        <NLink href={`/reading/${bookSlug}/${sectionSlug}`}>
-          <IconButton
-            icon={<CgChevronLeftO />}
-            size="xs"
-            aria-label={`return to ${data.prayerbooks[0].sections[0].name}`}
-          />
-        </NLink>
         <Spacer boxSize="8px" flexShrink={0} />
         {data.prayerbooks[0].sections[0].prayers[0].name}
       </ChHeading>
-      <br />
-      <ChHeading size="xs" opacity={0.55}>
-        PDF page{singlePage ? '' : 's'} {prayer.from_page}
+      <ChHeading size="xs" opacity={0.55} mb={8}>
+        Source page{singlePage ? '' : 's'} {prayer.from_page}
         {singlePage ? '' : ` - ${prayer.to_page}`}
       </ChHeading>
-      <Box height="32px" width="100%" flexShrink={0} />
+      <Box height="24px" width="100%" flexShrink={0} />
+      <NavigationButtons bookSlug={bookSlug} sectionSlug={sectionSlug} prayerSlug={prayerSlug} />
 
       <Container maxW="100%">
         <List spacing={3}>
@@ -226,6 +227,7 @@ export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSl
           })}
         </List>
       </Container>
+      <NavigationButtons bookSlug={bookSlug} sectionSlug={sectionSlug} prayerSlug={prayerSlug} />
     </>
   )
 }

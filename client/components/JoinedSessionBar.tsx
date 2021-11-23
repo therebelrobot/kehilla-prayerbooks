@@ -1,16 +1,11 @@
-import React, {useEffect, useState} from 'react'
-
-import {useRouter} from 'next/router'
-import {FaRegPauseCircle, FaRegStopCircle} from 'react-icons/fa'
-
-import {
-    Box, Button, ButtonGroup, useColorModeValue, useToast
-} from '@chakra-ui/react'
+import {Box, Button, ButtonGroup, useColorModeValue, useToast} from '@chakra-ui/react'
 import {load as fpLoad} from '@fingerprintjs/fingerprintjs'
-
-import {
-    useFollowReading, useInsertConnectedReader, useRemoveConnectedReader
-} from '_/services/Api/queries'
+import {useRouter} from 'next/router'
+import React, {useEffect, useState} from 'react'
+import {FaRegPauseCircle, FaRegStopCircle} from 'react-icons/fa'
+import {useFollowReading} from '_/services/Api/queries/readings/useFollowReading'
+import {useInsertConnectedReader} from '_/services/Api/queries/readings/useInsertConnectedReader'
+import {useRemoveConnectedReader} from '_/services/Api/queries/readings/useRemoveConnectedReader'
 import {useReadingSession} from '_/services/state'
 
 export const JoinedSessionBar = () => {

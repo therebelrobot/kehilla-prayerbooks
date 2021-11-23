@@ -1,20 +1,32 @@
-import React, {useCallback, useState} from 'react'
-
+import {
+  Box,
+  Button,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Switch,
+  Text,
+  useDisclosure,
+} from '@chakra-ui/react'
 import {Field, Form, Formik} from 'formik'
 import {transliterate} from 'hebrew-transliteration'
 import {remove} from 'ramda'
-
-import {
-    Box, Button, FormControl, FormErrorMessage, FormLabel, Input, Modal,
-    ModalBody, ModalCloseButton, ModalContent, ModalFooter, ModalHeader,
-    ModalOverlay, Switch, Text, useDisclosure
-} from '@chakra-ui/react'
-
+import React, {useCallback, useState} from 'react'
 import {HebrewInput} from '_/components/HebrewInput'
-import {
-    GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY, GET_PRAYERS_PROSE_AND_LINES,
-    useGetProseAndLines, useRemoveLine, useUpdateLine, useUpdatePrayer
-} from '_/services/Api/queries'
+import {GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY} from '_/services/Api/queries/prayers/GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY'
+import {useUpdatePrayer} from '_/services/Api/queries/prayers/useUpdatePrayer'
+import {GET_PRAYERS_PROSE_AND_LINES} from '_/services/Api/queries/proseAndLines/GET_PRAYERS_PROSE_AND_LINES'
+import {useGetProseAndLines} from '_/services/Api/queries/proseAndLines/useGetProseAndLines'
+import {useRemoveLine} from '_/services/Api/queries/proseAndLines/useRemoveLine'
+import {useUpdateLine} from '_/services/Api/queries/proseAndLines/useUpdateLine'
 
 export const EditPrayerLine = ({line, bookSlug, sectionSlug, prayerSlug, index}) => {
   console.log({line})

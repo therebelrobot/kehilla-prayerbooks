@@ -1,13 +1,17 @@
-import React, {FC} from 'react'
-
-import Link from 'next/link'
-import {CgChevronLeftO} from 'react-icons/cg'
-
 import {
-    Box, Heading, IconButton, Link as ChLink, List, ListItem, Spacer, Text
+  Box,
+  Heading,
+  IconButton,
+  Link as ChLink,
+  List,
+  ListItem,
+  Spacer,
+  Text,
 } from '@chakra-ui/react'
-
-import {useGetPrayersBySectionAndBookSlug} from '_/services/Api/queries'
+import Link from 'next/link'
+import React, {FC} from 'react'
+import {CgChevronLeftO} from 'react-icons/cg'
+import {useGetPrayersBySectionAndBookSlug} from '_/services/Api/queries/prayers/useGetPrayersBySectionAndBookSlug'
 
 interface ListPrayersProps {
   bookSlug: string
@@ -54,7 +58,7 @@ export const ListPrayers: FC<ListPrayersProps> = ({bookSlug, sectionSlug}) => {
               </Link>
               <Box boxSize="16px" />
               <Text fontSize="sm" opacity={0.55}>
-                PDF page{singlePage ? '' : 's'} {prayer.from_page}
+                Source page{singlePage ? '' : 's'} {prayer.from_page}
                 {singlePage ? '' : ` - ${prayer.to_page}`}
               </Text>
             </ListItem>

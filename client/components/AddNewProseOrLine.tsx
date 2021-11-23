@@ -1,15 +1,14 @@
-import React, {FC, useCallback, useRef} from 'react'
-
+import {Box, Button, ButtonGroup} from '@chakra-ui/react'
 import {insert} from 'ramda'
+import React, {FC, useCallback, useRef} from 'react'
 import {MdAddCircle} from 'react-icons/md'
 import {useHoverDirty} from 'react-use'
-
-import {Box, Button, ButtonGroup} from '@chakra-ui/react'
-
-import {
-    GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY, GET_PRAYERS_PROSE_AND_LINES,
-    useGetProseAndLines, useInsertLine, useInsertProse, useUpdatePrayer
-} from '_/services/Api/queries'
+import {GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY} from '_/services/Api/queries/prayers/GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY'
+import {useUpdatePrayer} from '_/services/Api/queries/prayers/useUpdatePrayer'
+import {GET_PRAYERS_PROSE_AND_LINES} from '_/services/Api/queries/proseAndLines/GET_PRAYERS_PROSE_AND_LINES'
+import {useGetProseAndLines} from '_/services/Api/queries/proseAndLines/useGetProseAndLines'
+import {useInsertLine} from '_/services/Api/queries/proseAndLines/useInsertLine'
+import {useInsertProse} from '_/services/Api/queries/proseAndLines/useInsertProse'
 
 interface AddNewProseOrLineProps {
   prayerSlug: string

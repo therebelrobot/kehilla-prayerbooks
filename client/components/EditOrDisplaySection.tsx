@@ -1,21 +1,32 @@
-import React from 'react'
-
+import {
+  Box,
+  Button,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
+  Link as ChLink,
+  ListItem,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  Text,
+  useDisclosure,
+} from '@chakra-ui/react'
 import {kebabCase} from 'case-anything'
 import {Field, Form, Formik, useFormikContext} from 'formik'
 import Link from 'next/link'
+import React from 'react'
 import {CgTrash} from 'react-icons/cg'
 import {MdDragHandle, MdModeEdit, MdOpenInBrowser} from 'react-icons/md'
-
-import {
-    Box, Button, FormControl, FormErrorMessage, FormLabel, Input,
-    Link as ChLink, ListItem, Modal, ModalBody, ModalCloseButton, ModalContent,
-    ModalFooter, ModalHeader, ModalOverlay, Text, useDisclosure
-} from '@chakra-ui/react'
-
-import {
-    GET_SECTIONS_BY_BOOK_SLUG_QUERY, useRemoveSection, useUpdateBookBySlug,
-    useUpdateSection
-} from '_/services/Api/queries'
+import {useUpdateBookBySlug} from '_/services/Api/queries/prayerbooks/useUpdateBookBySlug'
+import {GET_SECTIONS_BY_BOOK_SLUG_QUERY} from '_/services/Api/queries/sections/GET_SECTIONS_BY_BOOK_SLUG_QUERY'
+import {useRemoveSection} from '_/services/Api/queries/sections/useRemoveSection'
+import {useUpdateSection} from '_/services/Api/queries/sections/useUpdateSection'
 
 export const EditOrDisplaySection = ({
   section,

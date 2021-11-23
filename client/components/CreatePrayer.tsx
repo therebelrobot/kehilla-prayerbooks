@@ -1,16 +1,10 @@
-import React from 'react'
-
+import {Button, FormControl, FormErrorMessage, FormLabel, Input, ListItem} from '@chakra-ui/react'
 import {kebabCase} from 'case-anything'
 import {Field, Form, Formik, useFormikContext} from 'formik'
-
-import {
-    Button, FormControl, FormErrorMessage, FormLabel, Input, ListItem
-} from '@chakra-ui/react'
-
-import {
-    GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY, useInsertPrayer,
-    useUpdateSectionBySlug
-} from '_/services/Api/queries'
+import React from 'react'
+import {GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY} from '_/services/Api/queries/prayers/GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY'
+import {useInsertPrayer} from '_/services/Api/queries/prayers/useInsertPrayer'
+import {useUpdateSectionBySlug} from '_/services/Api/queries/sections/useUpdateSectionBySlug'
 
 export const CreatePrayer = ({setShowCreatePrayer, bookSlug, sectionSlug, prayerOrder}) => {
   const {insertPrayer} = useInsertPrayer(bookSlug, sectionSlug)
@@ -42,6 +36,7 @@ export const CreatePrayer = ({setShowCreatePrayer, bookSlug, sectionSlug, prayer
               name: values.name,
               slug: values.slug,
               section_slug: sectionSlug,
+              book_slug: bookSlug,
             },
           })
             .then((results) => {

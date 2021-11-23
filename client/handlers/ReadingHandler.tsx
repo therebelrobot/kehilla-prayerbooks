@@ -1,15 +1,11 @@
-import * as React from 'react'
-
-import {useRouter} from 'next/router'
-
 import {useAuth0} from '@auth0/auth0-react'
 import {load as fpLoad} from '@fingerprintjs/fingerprintjs'
-
+import {useRouter} from 'next/router'
+import * as React from 'react'
 import {ReadingLayout} from '_/layouts/ReadingLayout'
-import {
-    useLazyGetConnectedReaderById, useLazyGetSessionByUserId,
-    useUpdateStartedSession
-} from '_/services/Api/queries'
+import {useLazyGetConnectedReaderById} from '_/services/Api/queries/readings/useLazyGetConnectedReaderById'
+import {useLazyGetSessionByUserId} from '_/services/Api/queries/readings/useLazyGetSessionByUserId'
+import {useUpdateStartedSession} from '_/services/Api/queries/readings/useUpdateStartedSession'
 import {useReadingSession} from '_/services/state'
 
 export const ReadingHandler = () => {

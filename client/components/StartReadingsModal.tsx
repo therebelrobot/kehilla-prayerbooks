@@ -1,16 +1,22 @@
-import React, {useEffect, useState} from 'react'
-
-import random from 'simple-random'
-import {KEYBOARD_CHARS} from './KEYBOARD_CHARS'
-
 import {useAuth0} from '@auth0/auth0-react'
 import {
-    Box, Button, Modal, ModalBody, ModalCloseButton, ModalContent, ModalFooter,
-    ModalHeader, ModalOverlay, useClipboard, useToast
+  Box,
+  Button,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  useClipboard,
+  useToast,
 } from '@chakra-ui/react'
-
-import {useCreateReading} from '_/services/Api/queries'
+import React, {useEffect, useState} from 'react'
+import random from 'simple-random'
+import {useCreateReading} from '_/services/Api/queries/readings/useCreateReading'
 import {useReadingSession} from '_/services/state'
+import {KEYBOARD_CHARS} from './KEYBOARD_CHARS'
 
 export const StartReadingsModal = ({isOpen, onClose}) => {
   const {user, getIdTokenClaims} = useAuth0()

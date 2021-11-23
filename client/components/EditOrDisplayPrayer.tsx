@@ -1,23 +1,37 @@
-import React from 'react'
-
+import {
+  Box,
+  Button,
+  FormControl,
+  FormErrorMessage,
+  FormLabel,
+  Input,
+  Link as ChLink,
+  ListItem,
+  Modal,
+  ModalBody,
+  ModalCloseButton,
+  ModalContent,
+  ModalFooter,
+  ModalHeader,
+  ModalOverlay,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  Text,
+  useDisclosure,
+} from '@chakra-ui/react'
 import {kebabCase} from 'case-anything'
 import {Field, Form, Formik, useFormikContext} from 'formik'
 import Link from 'next/link'
+import React from 'react'
 import {CgTrash} from 'react-icons/cg'
 import {MdDragHandle, MdModeEdit, MdOpenInBrowser} from 'react-icons/md'
-
-import {
-    Box, Button, FormControl, FormErrorMessage, FormLabel, Input,
-    Link as ChLink, ListItem, Modal, ModalBody, ModalCloseButton, ModalContent,
-    ModalFooter, ModalHeader, ModalOverlay, NumberDecrementStepper,
-    NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper,
-    Text, useDisclosure
-} from '@chakra-ui/react'
-
-import {
-    GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY, useRemovePrayer,
-    useUpdatePrayer, useUpdateSectionBySlug
-} from '_/services/Api/queries'
+import {GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY} from '_/services/Api/queries/prayers/GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY'
+import {useRemovePrayer} from '_/services/Api/queries/prayers/useRemovePrayer'
+import {useUpdatePrayer} from '_/services/Api/queries/prayers/useUpdatePrayer'
+import {useUpdateSectionBySlug} from '_/services/Api/queries/sections/useUpdateSectionBySlug'
 
 export const EditOrDisplayPrayer = ({
   dragHandleProps,

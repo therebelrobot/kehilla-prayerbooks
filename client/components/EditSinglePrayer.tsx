@@ -1,16 +1,11 @@
-import React, {FC} from 'react'
-
+import {Container, Heading as ChHeading, IconButton, List, Spacer} from '@chakra-ui/react'
 import NLink from 'next/link'
+import React, {FC} from 'react'
 import {CgChevronLeftO} from 'react-icons/cg'
-
-import {
-    Container, Heading as ChHeading, IconButton, List, Spacer
-} from '@chakra-ui/react'
-
 import {AddNewProseOrLine} from '_/components/AddNewProseOrLine'
 import {EditPrayerLine} from '_/components/EditPrayerLine'
 import {TipTapProse} from '_/components/TipTapProse'
-import {useGetProseAndLines} from '_/services/Api/queries'
+import {useGetProseAndLines} from '_/services/Api/queries/proseAndLines/useGetProseAndLines'
 
 interface EditSinglePrayerProps {
   bookSlug: string

@@ -1,21 +1,24 @@
-import React, {FC, useState} from 'react'
-
+import {
+  Box,
+  Heading,
+  IconButton,
+  Link as ChLink,
+  List,
+  ListIcon,
+  ListItem,
+  Spacer,
+} from '@chakra-ui/react'
 import Link from 'next/link'
 import {move} from 'ramda'
+import React, {FC, useState} from 'react'
 import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd'
 import {CgChevronLeftO} from 'react-icons/cg'
 import {MdAddCircleOutline} from 'react-icons/md'
-import {EditOrDisplayPrayer} from './EditOrDisplayPrayer'
-
-import {
-    Box, Heading, IconButton, Link as ChLink, List, ListIcon, ListItem, Spacer
-} from '@chakra-ui/react'
-
 import {CreatePrayer} from '_/components/CreatePrayer'
-import {
-    GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY,
-    useGetPrayersBySectionAndBookSlug, useUpdateSection
-} from '_/services/Api/queries'
+import {GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY} from '_/services/Api/queries/prayers/GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY'
+import {useGetPrayersBySectionAndBookSlug} from '_/services/Api/queries/prayers/useGetPrayersBySectionAndBookSlug'
+import {useUpdateSection} from '_/services/Api/queries/sections/useUpdateSection'
+import {EditOrDisplayPrayer} from './EditOrDisplayPrayer'
 
 interface EditPrayersProps {
   bookSlug: string

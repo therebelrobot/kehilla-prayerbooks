@@ -8,7 +8,7 @@ import {
   MdSwapVerticalCircle,
 } from 'react-icons/md'
 import {CreateBook} from '_/components/CreateBook'
-import {useListPrayerbooks} from '_/services/Api/queries'
+import {useListPrayerbooks} from '_/services/Api/queries/prayerbooks/useListPrayerbooks'
 import {EditOrDisplayBook} from './EditOrDisplayBook'
 
 interface EditPrayerbooksProps {}

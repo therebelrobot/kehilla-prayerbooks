@@ -1,12 +1,16 @@
-import React from 'react'
-
-import {FaRegCopy, FaRegPauseCircle, FaRegStopCircle} from 'react-icons/fa'
-
 import {
-    Box, Button, ButtonGroup, Code, useClipboard, useColorModeValue, useToast
+  Box,
+  Button,
+  ButtonGroup,
+  Code,
+  useClipboard,
+  useColorModeValue,
+  useToast,
 } from '@chakra-ui/react'
-
-import {useFollowReading, useRemoveStartedSession} from '_/services/Api/queries'
+import React from 'react'
+import {FaRegCopy, FaRegPauseCircle, FaRegStopCircle} from 'react-icons/fa'
+import {useFollowReading} from '_/services/Api/queries/readings/useFollowReading'
+import {useRemoveStartedSession} from '_/services/Api/queries/readings/useRemoveStartedSession'
 import {useReadingSession} from '_/services/state'
 
 export const StartedSessionBar = () => {

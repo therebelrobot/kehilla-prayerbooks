@@ -1,8 +1,6 @@
-import React, {useEffect, useRef, useState} from 'react'
-
 import {Box} from '@chakra-ui/layout'
-
-import {useUpdateStartedSession} from '_/services/Api/queries'
+import React, {useEffect, useRef, useState} from 'react'
+import {useUpdateStartedSession} from '_/services/Api/queries/readings/useUpdateStartedSession'
 import {useReadingSession} from '_/services/state'
 
 export const SessionUpdater = ({type, id, children, ...props}) => {

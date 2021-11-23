@@ -1,14 +1,19 @@
-import React, {useState} from 'react'
-
-import Link from 'next/link'
-
 import {
-    Box, Container, Link as ChLink, List, ListItem, NumberDecrementStepper,
-    NumberIncrementStepper, NumberInput, NumberInputField, NumberInputStepper,
-    Text
+  Box,
+  Container,
+  Link as ChLink,
+  List,
+  ListItem,
+  NumberDecrementStepper,
+  NumberIncrementStepper,
+  NumberInput,
+  NumberInputField,
+  NumberInputStepper,
+  Text,
 } from '@chakra-ui/react'
-
-import {useGetAllPrayersByPageQuery} from '_/services/Api/queries'
+import Link from 'next/link'
+import React, {useState} from 'react'
+import {useGetAllPrayersByPageQuery} from '_/services/Api/queries/prayers/useGetAllPrayersByPageQuery'
 
 export const PageSearchPanel = ({bookSlug, onClose}) => {
   const [pageNumber, setPageNumber] = useState(1)
@@ -51,7 +56,7 @@ export const PageSearchPanel = ({bookSlug, onClose}) => {
                   </Text>
                   <Box boxSize="16px" />
                   <Text fontSize="sm" opacity={0.55}>
-                    PDF page{singlePage ? '' : 's'} {p.from_page || '?'}
+                    Source page{singlePage ? '' : 's'} {p.from_page || '?'}
                     {singlePage ? '' : ` - ${p.to_page}`}
                   </Text>
                 </ListItem>

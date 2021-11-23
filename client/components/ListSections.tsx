@@ -1,14 +1,18 @@
-import React, {FC} from 'react'
-
-import Link from 'next/link'
-import {CgChevronLeftO} from 'react-icons/cg'
-
 import {
-    Box, Container, Heading, IconButton, Link as ChLink, List, ListItem, Spacer,
-    Text
+  Box,
+  Container,
+  Heading,
+  IconButton,
+  Link as ChLink,
+  List,
+  ListItem,
+  Spacer,
+  Text,
 } from '@chakra-ui/react'
-
-import {useGetSectionsByBookSlug} from '_/services/Api/queries'
+import Link from 'next/link'
+import React, {FC} from 'react'
+import {CgChevronLeftO} from 'react-icons/cg'
+import {useGetSectionsByBookSlug} from '_/services/Api/queries/sections/useGetSectionsByBookSlug'
 
 interface ListSectionsProps {
   bookSlug: string
@@ -73,7 +77,7 @@ export const ListSections: FC<ListSectionsProps> = ({bookSlug}) => {
               </Link>
               <Box boxSize="16px" />
               <Text fontSize="sm" opacity={0.55}>
-                PDF page{singlePage ? '' : 's'} {section.toFromPages[0]}
+                Source page{singlePage ? '' : 's'} {section.toFromPages[0]}
                 {singlePage ? '' : ` - ${section.toFromPages[1]}`}
               </Text>
             </ListItem>
