@@ -1,12 +1,11 @@
 import {
   Box,
+  Button,
   Container,
   Heading,
-  IconButton,
   Link as ChLink,
   List,
   ListItem,
-  Spacer,
   Text,
 } from '@chakra-ui/react'
 import Link from 'next/link'
@@ -26,16 +25,13 @@ export const ListSections: FC<ListSectionsProps> = ({bookSlug}) => {
   if (error) return <p>Error :( {JSON.stringify(error)}</p>
   return (
     <>
+      <Link href={`/reading/`}>
+        <Button size="xs" leftIcon={<CgChevronLeftO />} variant="solid" mb={8}>
+          Back to library
+        </Button>
+      </Link>
       <Heading size="md" display="flex" flexDirection="row" alignItems="center">
-        <Link href={`/reading/`}>
-          <IconButton
-            icon={<CgChevronLeftO />}
-            size="xs"
-            aria-label={`return to List of prayerbooks`}
-          />
-        </Link>
-        <Spacer boxSize="8px" />
-        {data.prayerbooks[0].name} Sections
+        {data.prayerbooks[0].name}
       </Heading>
       <Box width="100%" height="16px" />
       <Container>

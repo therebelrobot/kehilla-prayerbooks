@@ -1,12 +1,12 @@
+import {useLazyQuery} from '@apollo/client'
 import {contextIfTokenPresent} from '../utils/contextIfTokenPresent'
-import {useQuery} from '../utils/useQuery'
-import {GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY} from './GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY'
+import {GET_PRAYERS_BY_SECTION_ID_AND_BOOK_SLUG_QUERY} from './GET_PRAYERS_BY_SECTION_ID_AND_BOOK_SLUG_QUERY'
 
-export const useGetPrayersBySectionAndBookSlug = (bookSlug, sectionSlug) => {
+export const useLazyGetPrayersBySectionIdAndBookSlug = (bookSlug) => {
   // console.log('useGetSectionsByBookSlug', bookSlug)
-  const {data, ...rest} = useQuery(GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY, {
+  const [getPrayer, {data, ...rest}] = useLazyQuery(GET_PRAYERS_BY_SECTION_ID_AND_BOOK_SLUG_QUERY, {
     ...contextIfTokenPresent(),
-    variables: {bookSlug, sectionSlug},
+    variables: {bookSlug},
   })
 
   let prayers = []
@@ -23,5 +23,15 @@ export const useGetPrayersBySectionAndBookSlug = (bookSlug, sectionSlug) => {
     sectionId = data.prayerbooks[0].sections[0].id
     book = data.prayerbooks[0]
   }
-  return {...rest, data, prayers, prayerOrder, sectionOrder, orderedPrayers, sectionId, book}
+  return {
+    ...rest,
+    data,
+    prayers,
+    prayerOrder,
+    sectionOrder,
+    orderedPrayers,
+    sectionId,
+    book,
+    getPrayer,
+  }
 }

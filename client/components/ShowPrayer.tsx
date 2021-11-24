@@ -51,7 +51,7 @@ interface ShowPrayerProps {
 }
 
 export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSlug}) => {
-  const {loading, error, data, prayer, prose, lines, ordered} = useGetProseAndLines(
+  const {loading, error, data, prayer, prose, lines, ordered, section, book} = useGetProseAndLines(
     bookSlug,
     sectionSlug,
     prayerSlug
@@ -66,7 +66,7 @@ export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSl
     <>
       <NLink href={`/reading/${bookSlug}/${sectionSlug}`}>
         <Button size="xs" leftIcon={<CgChevronLeftO />} variant="solid" mb={8}>
-          Back to {'Section Name'}
+          Back to {section.name}
         </Button>
       </NLink>
       <ChHeading size="md" display="flex" flexDirection="row" alignItems="center">

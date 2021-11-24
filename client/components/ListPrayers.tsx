@@ -1,13 +1,4 @@
-import {
-  Box,
-  Heading,
-  IconButton,
-  Link as ChLink,
-  List,
-  ListItem,
-  Spacer,
-  Text,
-} from '@chakra-ui/react'
+import {Box, Button, Heading, Link as ChLink, List, ListItem, Text} from '@chakra-ui/react'
 import Link from 'next/link'
 import React, {FC} from 'react'
 import {CgChevronLeftO} from 'react-icons/cg'
@@ -19,7 +10,7 @@ interface ListPrayersProps {
 }
 
 export const ListPrayers: FC<ListPrayersProps> = ({bookSlug, sectionSlug}) => {
-  const {loading, error, data, orderedPrayers} = useGetPrayersBySectionAndBookSlug(
+  const {loading, error, data, orderedPrayers, book} = useGetPrayersBySectionAndBookSlug(
     bookSlug,
     sectionSlug
   )
@@ -28,15 +19,12 @@ export const ListPrayers: FC<ListPrayersProps> = ({bookSlug, sectionSlug}) => {
   if (error) return <p>Error :( {JSON.stringify(error)}</p>
   return (
     <>
+      <Link href={`/reading/${bookSlug}`}>
+        <Button size="xs" leftIcon={<CgChevronLeftO />} variant="solid" mb={8}>
+          Back to {book.name}
+        </Button>
+      </Link>
       <Heading size="md" display="flex" flexDirection="row" alignItems="center">
-        <Link href={`/reading/${bookSlug}`}>
-          <IconButton
-            icon={<CgChevronLeftO />}
-            size="xs"
-            aria-label={`return to List of prayerbooks`}
-          />
-        </Link>
-        <Spacer boxSize="8px" />
         {data.prayerbooks[0].name}
       </Heading>
       <Heading size="sm" display="flex" flexDirection="row" alignItems="center">

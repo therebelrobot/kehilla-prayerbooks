@@ -14,12 +14,16 @@ export const useGetProseAndLines = (bookSlug, sectionSlug, prayerSlug) => {
   let order = []
   let prayerId = null
   let prayer = null
+  let section = null
+  let book = null
   if (data) {
     prayerId = data.prayerbooks[0].sections[0].prayers[0].id
     prose = data.prayerbooks[0].sections[0].prayers[0].proses
     lines = data.prayerbooks[0].sections[0].prayers[0].prayer_lines
     order = data.prayerbooks[0].sections[0].prayers[0].line_prose_order || []
     prayer = data.prayerbooks[0].sections[0].prayers[0]
+    section = data.prayerbooks[0].sections[0]
+    book = data.prayerbooks[0]
   }
   // console.log({prose, lines, order})
   const ordered = order.map((typeId) => {
@@ -31,5 +35,16 @@ export const useGetProseAndLines = (bookSlug, sectionSlug, prayerSlug) => {
     }
     return {...lines.find((l) => l.id === Number(id)), type}
   })
-  return {...rest, data, prayer, prose, lines, ordered, lineProseOrder: order, prayerId}
+  return {
+    ...rest,
+    data,
+    prayer,
+    prose,
+    lines,
+    ordered,
+    lineProseOrder: order,
+    prayerId,
+    section,
+    book,
+  }
 }

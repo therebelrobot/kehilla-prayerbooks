@@ -1,7 +1,7 @@
 import {gql} from '@apollo/client'
 
-export const GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY = gql`
-  query GetPrayersBySectionAndBookSlugQuery($bookSlug: String!, $sectionSlug: String!) {
+export const GET_PRAYERS_BY_SECTION_ID_AND_BOOK_SLUG_QUERY = gql`
+  query GetPrayersBySectionIdAndBookSlugQuery($bookSlug: String!, $sectionId: Int!) {
     prayerbooks(where: {slug: {_eq: $bookSlug}}) {
       name
       status
@@ -9,7 +9,7 @@ export const GET_PRAYERS_BY_SECTION_AND_BOOK_SLUG_QUERY = gql`
       id
       slug
       section_order
-      sections(where: {slug: {_eq: $sectionSlug}}) {
+      sections(where: {id: {_eq: $sectionId}}) {
         id
         slug
         is_supplemental
