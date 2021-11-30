@@ -1,11 +1,9 @@
+import {uniq} from 'lodash'
 import create from 'zustand'
 
 // type definitions
 
 export interface State {
-  friendName: string
-  fancyFriendName: string
-  updateFriendName: (newName: State['friendName']) => void
   selectedFont: 'Spectral'
   updateSelectedFont: (newFont: State['selectedFont']) => void
   reload: boolean
@@ -28,21 +26,43 @@ export interface State {
   toggleShowTrans: () => void
   showEng: boolean
   toggleShowEng: () => void
+  termReplace: {
+    enable: boolean
+    target: {
+      en: string[]
+      tr: string[]
+      hb: string[]
+    }
+    replacement: {
+      en: string
+      tr: string
+      hb: string
+    }
+  }
+  toggleTermReplace: () => void
+  editTermReplaceTargets: (
+    type: keyof State['termReplace']['target'],
+    targetStrings:
+      | State['termReplace']['target']['en'][0]
+      | State['termReplace']['target']['tr'][0]
+      | State['termReplace']['target']['hb'][0]
+  ) => void
+  clearTermReplaceTargets: (type: keyof State['termReplace']['target']) => void
+  updateTermReplaceReplacement: (
+    type: keyof State['termReplace']['replacement'],
+    replacementString:
+      | State['termReplace']['replacement']['en'][0]
+      | State['termReplace']['replacement']['tr'][0]
+      | State['termReplace']['replacement']['hb'][0]
+  ) => void
+  clearTermReplaceReplacement: (type: keyof State['termReplace']['replacement']) => void
 }
 
 // defaults
-const defaultFriendName = 'world'
-const defaultFancyFriendName = `✨ ${defaultFriendName} ✨`
 const defaultSelectedFont = 'Spectral'
 const defaultForceReload = false
 
 // mutations
-const updateFriendName = (newName: State['friendName'], state: State) => {
-  const newState = {...state}
-  newState.friendName = newName
-  newState.fancyFriendName = `✨ ${newName} ✨`
-  return newState
-}
 
 const updateSelectedFont = (newFont: State['selectedFont'], state: State) => {
   const newState = {...state}
@@ -100,19 +120,66 @@ const toggleShowEng = (state: State) => {
   newState.showEng = !newState.showEng
   return newState
 }
-
-// selectors
-const getFriendName = (state: State) => state.friendName
-const getFancyFriendName = (state: State) => state.fancyFriendName
+const toggleTermReplace = (state: State) => {
+  const newState = {...state}
+  newState.termReplace.enable = !newState.termReplace.enable
+  return newState
+}
+const editTermReplaceTargets = (
+  type: keyof State['termReplace']['target'],
+  targetString:
+    | State['termReplace']['target']['en'][0]
+    | State['termReplace']['target']['tr'][0]
+    | State['termReplace']['target']['hb'][0],
+  state: State
+) => {
+  const newState = {...state}
+  newState.termReplace.target[type] = uniq(targetString.split(','))
+  return newState
+}
+const removeTermReplaceTargets = (
+  type: keyof State['termReplace']['target'],
+  targetString:
+    | State['termReplace']['target']['en'][0]
+    | State['termReplace']['target']['tr'][0]
+    | State['termReplace']['target']['hb'][0],
+  state: State
+) => {
+  const newState = {...state}
+  newState.termReplace.target[type] = targetString.split(',').map((t) => t.trim())
+  return newState
+}
+const clearTermReplaceTargets = (type: keyof State['termReplace']['target'], state: State) => {
+  const newState = {...state}
+  newState.termReplace.target[type] = []
+  return newState
+}
+const updateTermReplaceReplacement = (
+  type: keyof State['termReplace']['replacement'],
+  replacementString:
+    | State['termReplace']['replacement']['en']
+    | State['termReplace']['replacement']['tr']
+    | State['termReplace']['replacement']['hb'],
+  state: State
+) => {
+  const newState = {...state}
+  newState.termReplace.replacement[type] = replacementString
+  return newState
+}
+const clearTermReplaceReplacement = (
+  type: keyof State['termReplace']['replacement'],
+  state: State
+) => {
+  const newState = {...state}
+  newState.termReplace.replacement[type] = ''
+  return newState
+}
 
 // hooks
 // this useStore hook is low-level, should be abstracted by
 // specific selector hooks, as seen below
 export const useStore = create(
   (set): State => ({
-    friendName: defaultFriendName,
-    fancyFriendName: defaultFancyFriendName,
-    updateFriendName: (newName: string) => set((state: State) => updateFriendName(newName, state)),
     selectedFont: defaultSelectedFont,
     updateSelectedFont: (newFont: State['selectedFont']) =>
       set((state: State) => updateSelectedFont(newFont, state)),
@@ -141,18 +208,31 @@ export const useStore = create(
     toggleShowHebrew: () => set((state: State) => toggleShowHebrew(state)),
     toggleShowTrans: () => set((state: State) => toggleShowTrans(state)),
     toggleShowEng: () => set((state: State) => toggleShowEng(state)),
+    termReplace: {
+      enable: false,
+      target: {
+        en: [],
+        tr: [],
+        hb: [],
+      },
+      replacement: {
+        en: '',
+        tr: '',
+        hb: '',
+      },
+    },
+    toggleTermReplace: () => set((state: State) => toggleTermReplace(state)),
+    editTermReplaceTargets: (type, targetString) =>
+      set((state: State) => editTermReplaceTargets(type, targetString, state)),
+    clearTermReplaceTargets: (type) => set((state: State) => clearTermReplaceTargets(type, state)),
+    updateTermReplaceReplacement: (type, replacementString) =>
+      set((state: State) => updateTermReplaceReplacement(type, replacementString, state)),
+    clearTermReplaceReplacement: (type) =>
+      set((state: State) => clearTermReplaceReplacement(type, state)),
   })
 )
 
 // selector hooks
-export const useFriendName = () =>
-  useStore((state: State) => ({
-    friendName: state.friendName,
-    fancyFriendName: state.fancyFriendName,
-    updateFriendName: state.updateFriendName,
-    getFriendName: () => getFriendName(state),
-    getFancyFriendName: () => getFancyFriendName(state),
-  }))
 
 export const useFont = () =>
   useStore((state: State) => ({
@@ -194,4 +274,13 @@ export const useFilters = () =>
     toggleShowHebrew: state.toggleShowHebrew,
     toggleShowTrans: state.toggleShowTrans,
     toggleShowEng: state.toggleShowEng,
+  }))
+export const useTermReplace = () =>
+  useStore((state: State) => ({
+    termReplace: state.termReplace,
+    toggleTermReplace: state.toggleTermReplace,
+    editTermReplaceTargets: state.editTermReplaceTargets,
+    clearTermReplaceTargets: state.clearTermReplaceTargets,
+    updateTermReplaceReplacement: state.updateTermReplaceReplacement,
+    clearTermReplaceReplacement: state.clearTermReplaceReplacement,
   }))

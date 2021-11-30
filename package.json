@@ -76,6 +76,7 @@
     "subscriptions-transport-ws": "^0.9.19",
     "swr": "^0.5.6",
     "throttle-debounce": "^3.0.1",
+    "use-debouncy": "^4.2.1",
     "zustand": "^3.5.4"
   },
   "scripts": {

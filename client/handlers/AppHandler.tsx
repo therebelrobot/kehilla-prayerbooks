@@ -1,10 +1,7 @@
-import React from 'react'
-
-import Head from 'next/head'
-
 import {Auth0Provider} from '@auth0/auth0-react'
 import {ChakraProvider, CSSReset, extendTheme} from '@chakra-ui/react'
-
+import Head from 'next/head'
+import React from 'react'
 import {AppLayout} from '_/layouts/AppLayout'
 import {ApiProvider} from '_/services/Api/ApiProvider'
 import {useFont, useReload} from '_/services/state'

@@ -27,8 +27,8 @@ import Link from 'next/link'
 import React from 'react'
 import {CgTrash} from 'react-icons/cg'
 import {MdModeEdit, MdOpenInBrowser} from 'react-icons/md'
-import {useRemoveBook} from '_/services/Api/queries/useRemoveBook'
-import {useUpdateBook} from '_/services/Api/queries/useUpdateBook'
+import {useRemoveBook} from '_/services/Api/queries/prayerbooks/useRemoveBook'
+import {useUpdateBook} from '_/services/Api/queries/prayerbooks/useUpdateBook'
 import {statusColors, statusIcons} from './EditPrayerbooks'
 
 export const EditOrDisplayBook = ({book, editingId, setEditingId}) => {

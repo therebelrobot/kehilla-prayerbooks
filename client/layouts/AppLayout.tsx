@@ -1,14 +1,12 @@
-import React from 'react'
-
-import NoSSR from 'react-no-ssr'
-
 import {Box, useColorMode} from '@chakra-ui/react'
 import {css, Global} from '@emotion/react'
-
+import React from 'react'
+import NoSSR from 'react-no-ssr'
 import {FilterMenu} from '_/components/FilterMenu'
 import {ReadingsMenu} from '_/components/ReadingsMenu'
 import {SearchMenu} from '_/components/SearchMenu'
 import {SettingsMenu} from '_/components/SettingsMenu'
+import {TermReplaceMenu} from '_/components/TermReplaceMenu'
 
 export const AppLayout = ({children}) => {
   // Do not put state handling here (Graphql, useState, etc.)
@@ -47,6 +45,7 @@ export const AppLayout = ({children}) => {
           <FilterMenu />
           <ReadingsMenu />
           <SearchMenu />
+          <TermReplaceMenu />
         </NoSSR>
         {children}
       </Box>

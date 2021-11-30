@@ -42,7 +42,7 @@ import {CgChevronLeftO} from 'react-icons/cg'
 import {NavigationButtons} from '_/components/NavigationButtons'
 import {SessionUpdater} from '_/components/SessionUpdater'
 import {useGetProseAndLines} from '_/services/Api/queries/proseAndLines/useGetProseAndLines'
-import {useFilters} from '_/services/state'
+import {useFilters, useTermReplace} from '_/services/state'
 
 interface ShowPrayerProps {
   bookSlug: string
@@ -56,6 +56,8 @@ export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSl
     sectionSlug,
     prayerSlug
   )
+  const {termReplace, toggleTermReplace, editTermReplaceTargets, updateTermReplaceReplacement} =
+    useTermReplace()
   const {showHebrew, showTrans, showEng} = useFilters()
   if (loading) return <p>Loading...</p>
   if (error) return <p>Error :( {JSON.stringify(error)}</p>
@@ -116,6 +118,19 @@ export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSl
                 TableHeader,
               ])
               console.log(content, typeof content)
+              const types = ['en', 'hb', 'tr']
+              let replacedContent = content
+              if (termReplace.enable) {
+                for (const type of types) {
+                  for (const term of termReplace.target[type]) {
+                    const replaceTerm = term.trim()
+                    replacedContent = replacedContent.replace(
+                      new RegExp(replaceTerm, 'ig'),
+                      `<abbr title="Original text: ${replaceTerm}">${termReplace.replacement[type]}</abbr>`
+                    )
+                  }
+                }
+              }
               return (
                 <SessionUpdater id={item.id} type="prose">
                   <Container>
@@ -123,13 +138,16 @@ export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSl
                       key={`prose-${item.id}`}
                       className="ProseMirror"
                       dangerouslySetInnerHTML={{
-                        __html: content,
+                        __html: replacedContent,
                       }}
                     />
                   </Container>
                 </SessionUpdater>
               )
             } else if (item.type === 'line') {
+              const enRegex = new RegExp(termReplace.target.en.join('|'), 'gi')
+              const hbRegex = new RegExp(termReplace.target.hb.join('|'), 'gi')
+              const trRegex = new RegExp(termReplace.target.tr.join('|'), 'gi')
               return (
                 <SessionUpdater id={item.id} type="line" width="100%">
                   <Box
@@ -158,7 +176,22 @@ export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSl
                           >
                             {!!item.hebrew.length ? (
                               <ChText className="hebrew" display="block" dir="rtl">
-                                {item.hebrew}
+                                {!termReplace.enable && item.hebrew}
+                                {termReplace.enable &&
+                                  item.hebrew.split(trRegex).map((str, i, arr) => {
+                                    return (
+                                      <>
+                                        {str}
+                                        {i + 1 !== arr.length && (
+                                          <abbr
+                                            title={`Original text: ${termReplace.target.hb.join()}`}
+                                          >
+                                            {' ' + termReplace.replacement.hb + ' '}
+                                          </abbr>
+                                        )}
+                                      </>
+                                    )
+                                  })}
                               </ChText>
                             ) : (
                               <ChText fontSize="10px" as="i" opacity={0.55}>
@@ -183,7 +216,24 @@ export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSl
                             textAlign={showHebrew ? 'left' : showEng ? 'right' : 'center'}
                           >
                             {!!item.transliteration.length ? (
-                              <ChText as="strong">{item.transliteration}</ChText>
+                              <ChText as="strong">
+                                {!termReplace.enable && item.transliteration}
+                                {termReplace.enable &&
+                                  item.transliteration.split(trRegex).map((str, i, arr) => {
+                                    return (
+                                      <>
+                                        {str}
+                                        {i + 1 !== arr.length && (
+                                          <abbr
+                                            title={`Original text: ${termReplace.target.tr.join()}`}
+                                          >
+                                            {termReplace.replacement.tr}
+                                          </abbr>
+                                        )}
+                                      </>
+                                    )
+                                  })}
+                              </ChText>
                             ) : (
                               <ChText fontSize="10px" as="i" opacity={0.55}>
                                 No Transliteration Available
@@ -203,7 +253,24 @@ export const ShowPrayer: FC<ShowPrayerProps> = ({bookSlug, sectionSlug, prayerSl
                           justifyContent={showHebrew || showTrans ? 'flex-start' : 'center'}
                         >
                           {!!item.translation.length ? (
-                            <ChText>{item.translation}</ChText>
+                            <ChText>
+                              {!termReplace.enable && item.translation}
+                              {termReplace.enable &&
+                                item.translation.split(enRegex).map((str, i, arr) => {
+                                  return (
+                                    <>
+                                      {str}
+                                      {i + 1 !== arr.length && (
+                                        <abbr
+                                          title={`Original text: ${termReplace.target.en.join()}`}
+                                        >
+                                          {termReplace.replacement.en}
+                                        </abbr>
+                                      )}
+                                    </>
+                                  )
+                                })}
+                            </ChText>
                           ) : (
                             <ChText fontSize="10px" as="i" opacity={0.55}>
                               No English Translation Available
